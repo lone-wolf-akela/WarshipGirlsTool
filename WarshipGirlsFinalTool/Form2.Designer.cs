@@ -51,7 +51,9 @@
             this.explore1 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.shipPic = new System.Windows.Forms.PictureBox();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.shipPic)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -248,11 +250,21 @@
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // shipPic
+            // 
+            this.shipPic.Location = new System.Drawing.Point(563, 69);
+            this.shipPic.Name = "shipPic";
+            this.shipPic.Size = new System.Drawing.Size(221, 168);
+            this.shipPic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.shipPic.TabIndex = 15;
+            this.shipPic.TabStop = false;
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(627, 429);
+            this.ClientSize = new System.Drawing.Size(882, 500);
+            this.Controls.Add(this.shipPic);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.textBox7);
             this.Controls.Add(this.textBox6);
@@ -276,6 +288,7 @@
             this.Resize += new System.EventHandler(this.Form2_Resize);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.shipPic)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -304,5 +317,6 @@
         private System.Windows.Forms.Label explore1;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.PictureBox shipPic;
     }
 }

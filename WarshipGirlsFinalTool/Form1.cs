@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json.Linq;
 
 namespace WarshipGirlsFinalTool
 {
@@ -17,7 +18,6 @@ namespace WarshipGirlsFinalTool
     {
         private Form2 form2;
         private Warshipgirls conn;
-        //private string udid;
 
         public bool ingame = false;
         public void notice(int timeout,string title,string text, ToolTipIcon icon)
@@ -28,17 +28,10 @@ namespace WarshipGirlsFinalTool
         {
             InitializeComponent();
             var configini = new IniFile("config.ini");
-            /*if (configini.KeyExists("UDID", "Machine"))
-            {
-                udid = configini.Read("UDID", "Machine");
-            }
-            else
-            {
-                udid = helper.GetNewUDID();
-                configini.Write("UDID", udid, "Machine");
-            }*/
             Username.Text = configini.Read("USERNAME", "Account");
             Password.Text = configini.Read("PASSWORD", "Account");
+
+            Directory.CreateDirectory("documents");
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -48,15 +41,22 @@ namespace WarshipGirlsFinalTool
                 version = @"2.7.0",
                 username = Username.Text,
                 password = Password.Text,
-                //udid = udid
             };
             if (iOS.Checked)
             {
+                conn.firstSever = @"http://version.jr.moefantasy.com/";
                 conn.market = 3;
                 conn.channel = 2;
             }
             else if (Android.Checked)
             {
+                conn.firstSever = @"http://version.jr.moefantasy.com/";
+                conn.market = 2;
+                conn.channel = 0;
+            }
+            else if (Japan.Checked)
+            {
+                conn.firstSever = @"http://version.jp.warshipgirls.com/";
                 conn.market = 2;
                 conn.channel = 0;
             }
@@ -65,11 +65,13 @@ namespace WarshipGirlsFinalTool
                 throw new Exception("Please Choose a Server!");
             }
             conn.checkVer();
-            conn.login();
+            conn.getInitConfigs();
+            conn.downloadRes(this);
+            conn.passportLogin();
             listBox1.Items.Clear();
-            foreach (string server in conn.serverList)
+            foreach (var server in conn.passportLogin_txt["serverList"])
             {
-                listBox1.Items.Add(server);
+                listBox1.Items.Add((string) server["name"]);
             }
 
             var configini = new IniFile("config.ini");
@@ -79,7 +81,8 @@ namespace WarshipGirlsFinalTool
 
         private void button2_Click(object sender, EventArgs e)
         {
-            conn.enter(listBox1.SelectedIndex);
+            conn.login(listBox1.SelectedIndex);
+            conn.initGame();
             form2 = new Form2
             {
                 form1 = this,
@@ -95,7 +98,7 @@ namespace WarshipGirlsFinalTool
             Application.Exit();
         }
 
-        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (ingame)
             {
@@ -110,51 +113,3 @@ namespace WarshipGirlsFinalTool
         }
     }
 }
-
-/*
- //请求
-            string uri = @"http://version.jr.moefantasy.com/index/checkVer/2.7.0/4/0&market=4&channel=0&version=2.7.0";
-            HttpWebRequest request = HttpWebRequest.Create(uri) as HttpWebRequest;
-            request.Method = @"GET";                            //请求方法
-            request.ProtocolVersion = new Version(1, 1);   //Http/1.1版本
-            request.UserAgent = @"Dalvik/1.6.0 (Linux; U; Android 4.4.2; NoxW Build/KOT49H)";
-            request.Host = "version.jr.moefantasy.com";
-            //request.Connection = @"Keep-Alive";
-
-
-            //Add Other ...
-            var response =request.GetResponse() as HttpWebResponse;
-            //Header
-            foreach (var item in response.Headers)
-            {
-                textBox1.Text += item.ToString() + ": " +
-                                 response.GetResponseHeader(item.ToString()) + "\n";
-            }
-
-            //如果主体信息不为空，则接收主体信息内容
-            if (response.ContentLength <= 0)
-                return;
-            //接收响应主体信息
-
-            byte[] bytes;
-
-            using (Stream stream = response.GetResponseStream())
-            {
-                int totalLength = (int)response.ContentLength;
-                int numBytesRead = 0;
-                bytes = new byte[totalLength + 1024];
-                //通过一个循环读取流中的数据，读取完毕，跳出循环
-                while (numBytesRead < totalLength)
-                {
-                    int num = stream.Read(bytes, numBytesRead, 1024);  //每次希望读取1024字节
-                    if (num == 0)   //说明流中数据读取完毕
-                        break;
-                    numBytesRead += num;
-                }
-
-
-            }
-            //将接收到的主体数据显示到界面
-            string content = Encoding.UTF8.GetString(bytes);
-            textBox1.Text += content;
-*/

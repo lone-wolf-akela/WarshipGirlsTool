@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using WarshipGirlsPNGTool;
 
 namespace WarshipGirlsFinalTool
 {
@@ -15,25 +18,63 @@ namespace WarshipGirlsFinalTool
         
         public Warshipgirls conn;
         public Form1 form1;
+
+        private readonly Label[] explore = new Label[1 + 4];
         public Form2()
         {
             InitializeComponent();
+            explore[1] = explore1;
+            explore[2] = explore2;
+            explore[3] = explore3;
+            explore[4] = explore4;
         }
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            RefreshData();
+            RefreshBasicData();
+            string secretaryID = conn.gameinfo["secretary"].ToString();
+            if (secretaryID == "0")
+            {
+                secretaryID = (from fleet in conn.gameinfo["fleetVo"]
+                    where fleet["id"].ToString() == "1"
+                    select fleet["ships"][0].ToString()).First();
+            }
+            var secretary = (from ship in conn.gameinfo["userShipVO"]
+                where ship["id"].ToString() == secretaryID
+                select ship).First();
+            string secretaryModel;
+            if (secretary["skin_cid"].ToString() != "0")
+            {
+                secretaryModel = (from skin in conn.init_txt["ShipSkin"]
+                    where skin["cid"].ToString() ==
+                          secretary["skin_cid"].ToString()
+                    select skin["skinId"].ToString()).First();
+            }
+            else
+            {
+                secretaryModel = (from ship in conn.init_txt["shipCard"]
+                    where ship["cid"].ToString() ==
+                          secretary["shipCid"].ToString()
+                    select ship["picId"].ToString()).First();
+            }
+            secretaryModel = @"documents\hot\ccbResources\model\M_NORMAL_"
+                             + secretaryModel + ".muka";
+            if (!File.Exists(secretaryModel))
+            {
+                secretaryModel += "R";
+            }
+            shipPic.Image = WSGPNG.getShipModel(secretaryModel);
         }
 
-        private void RefreshData()
+        private void RefreshBasicData()
         {
-            textBox1.Text = conn.gameInfo.username;
-            textBox2.Text = conn.gameInfo.level;
-            textBox3.Text = conn.gameInfo.exp;
-            textBox4.Text = conn.gameInfo.oil.ToString();
-            textBox5.Text = conn.gameInfo.ammo.ToString();
-            textBox6.Text = conn.gameInfo.steel.ToString();
-            textBox7.Text = conn.gameInfo.aluminium.ToString();
+            textBox1.Text = (string) conn.gameinfo["userVo"]["username"];
+            textBox2.Text = (string) conn.gameinfo["userVo"]["level"];
+            textBox3.Text = (string) conn.gameinfo["userVo"]["exp"];
+            textBox4.Text = (string) conn.gameinfo["userVo"]["oil"];
+            textBox5.Text = (string) conn.gameinfo["userVo"]["ammo"];
+            textBox6.Text = (string) conn.gameinfo["userVo"]["steel"];
+            textBox7.Text = (string) conn.gameinfo["userVo"]["aluminium"];
         }
 
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)
@@ -48,60 +89,45 @@ namespace WarshipGirlsFinalTool
                 this.Hide();
         }
 
-        enum ExploreState
+        private enum ExploreState
         {
             idle,exploring,finshed
         }
 
-        private ExploreState[] explorestate = new ExploreState[4]
-            {
-                ExploreState.idle, ExploreState.idle, ExploreState.idle, ExploreState.idle
-            };
+        private readonly ExploreState[] explorestate = new ExploreState[1 + 4]
+        {
+            ExploreState.idle, ExploreState.idle, ExploreState.idle, ExploreState.idle, ExploreState.idle
+        };
         private void timer1_Tick(object sender, EventArgs e)
         {
-            bool[] state = new bool[4] {false, false, false, false};
-            for (int i = 0; i < conn.gameInfo.exploreinfo.exploreCount; i++)
+            for (int fleetId = 1; fleetId <= 4; fleetId++)
             {
-                Label label;
-                switch (conn.gameInfo.exploreinfo.fleetId[i])
+                var info = from expinfo in conn.gameinfo["pveExploreVo"]["levels"]
+                    where (string) expinfo["fleetId"] == fleetId.ToString()
+                    select expinfo;
+                if (!info.Any())
                 {
-                    case "1":
-                        label = explore1;
-                        state[0] = true;
-                        break;
-                    case "2":
-                        label = explore2;
-                        state[1] = true;
-                        break;
-                    case "3":
-                        label = explore3;
-                        state[2] = true;
-                        break;
-                    case "4":
-                        label = explore4;
-                        state[3] = true;
-                        break;
-                    default:
-                        throw new Exception("Invalid fleetId!");
-                }
-                int time = (int)(conn.gameInfo.exploreinfo.endTime[i]-DateTime.Now.ToUTC()/1000);
-                if (time >= 0)
-                {
-                    explorestate[i] = ExploreState.exploring;
-                    label.Text = new TimeSpan(0, 0, time).ToString(@"hh\:mm\:ss");
+                    explore[fleetId].Text = "空闲";
+                    explorestate[fleetId]=ExploreState.idle;
                 }
                 else
                 {
-                    if (explorestate[i] != ExploreState.finshed)
-                        form1.notice(2000, "远征提醒", string.Format("第{0}舰队的远征完成了！", i + 1), ToolTipIcon.Info);
-                    explorestate[i]=ExploreState.finshed;
-                    label.Text = "完成！";
+                    int time = (int)(long.Parse((string) info.First()["endTime"])
+                        - DateTime.Now.ToUTC() / 1000);
+                    if (time >= 0)
+                    {
+                        explorestate[fleetId] = ExploreState.exploring;
+                        explore[fleetId].Text = new TimeSpan(0, 0, time).ToString(@"hh\:mm\:ss");
+                    }
+                    else
+                    {
+                        if (explorestate[fleetId] != ExploreState.finshed)
+                            form1.notice(2000, "远征提醒", string.Format("第{0}舰队的远征完成了！", fleetId), ToolTipIcon.Info);
+                        explorestate[fleetId] = ExploreState.finshed;
+                        explore[fleetId].Text = "完成！";
+                    }
                 }
-            }
-            if (!state[0]) explore1.Text = "空闲";
-            if (!state[1]) explore2.Text = "空闲";
-            if (!state[2]) explore3.Text = "空闲";
-            if (!state[3]) explore4.Text = "空闲";
+            }  
         }
     }
 }
