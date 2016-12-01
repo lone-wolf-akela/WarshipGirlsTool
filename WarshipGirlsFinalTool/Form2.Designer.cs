@@ -252,10 +252,11 @@
             // 
             // shipPic
             // 
-            this.shipPic.Location = new System.Drawing.Point(563, 69);
+            this.shipPic.BackColor = System.Drawing.Color.Transparent;
+            this.shipPic.Location = new System.Drawing.Point(494, 44);
             this.shipPic.Name = "shipPic";
-            this.shipPic.Size = new System.Drawing.Size(221, 168);
-            this.shipPic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.shipPic.Size = new System.Drawing.Size(567, 554);
+            this.shipPic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.shipPic.TabIndex = 15;
             this.shipPic.TabStop = false;
             // 
@@ -263,7 +264,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(882, 500);
+            this.BackColor = System.Drawing.Color.White;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.ClientSize = new System.Drawing.Size(1582, 853);
             this.Controls.Add(this.shipPic);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.textBox7);
@@ -280,6 +283,7 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form2";
             this.Text = "Form2";

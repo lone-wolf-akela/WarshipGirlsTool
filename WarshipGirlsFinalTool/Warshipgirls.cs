@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
@@ -11,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
+using WarshipGirlsPNGTool;
 using static WarshipGirlsFinalTool.helper;
 
 namespace WarshipGirlsFinalTool
@@ -24,14 +26,14 @@ namespace WarshipGirlsFinalTool
         public string username;
         public string password;
 
-        private const string device = @"Lone Wolf PC Client/0.0.1 (Windows 10)";
+        private const string device = @"Lone Wolf PC Client/0.0.2 (Windows 10)";
 
-        private readonly JsonText version_txt = new JsonText();
-        public readonly JsonText init_txt = new JsonText();
-        private readonly JsonText proj_manifest = new JsonText();
-        public readonly JsonText passportLogin_txt = new JsonText();
-        private readonly JsonText login_txt = new JsonText();
-        public readonly JsonText gameinfo = new JsonText();
+        private JsonText version_txt;
+        public JsonText init_txt;
+        private JsonText proj_manifest;
+        public JsonText passportLogin_txt;
+        private JsonText login_txt;
+        public JsonText gameinfo;
 
         private string hf_skey;
         private string loginServer;
@@ -42,6 +44,18 @@ namespace WarshipGirlsFinalTool
         private string uriend()
         {
             return @"&market=" + market + @"&channel=" + channel + @"&version=" + version;
+        }
+
+        private JsonText CreateJsonText(string text)
+        {
+            var result = new JsonText(text);
+            if (result["eid"] == null) return result;
+            if (init_txt != null &&
+               (string)init_txt["errorCode"][(string)result["eid"]] != null)
+                throw new Exception(
+                    (string)init_txt["errorCode"][(string)result["eid"]]);
+            else
+                throw new Exception("eid:" + result["eid"]);
         }
         public void checkVer()
         {
@@ -56,8 +70,8 @@ namespace WarshipGirlsFinalTool
             var response = request.GetResponse() as HttpWebResponse;
             Stream stream = response.GetResponseStream();
             var reader = new StreamReader(stream, Encoding.UTF8);
-            version_txt.text = reader.ReadToEnd();
-            version_txt.Parse();
+
+            version_txt = CreateJsonText(reader.ReadToEnd());
             loginServer = version_txt["loginServer"].ToString().Replace(@"\/", @"/");
             if (version_txt["ResUrlWu"] != null)
             {
@@ -73,9 +87,8 @@ namespace WarshipGirlsFinalTool
             if (File.Exists(@"documents\init.txt"))
             {
                 var sr = new StreamReader(@"documents\init.txt", Encoding.UTF8);
-                init_txt.text = sr.ReadToEnd();
+                init_txt = CreateJsonText(sr.ReadToEnd());
                 sr.Close();
-                init_txt.Parse();
                 if ((string)init_txt["DataVersion"] == (string)version_txt["DataVersion"])
                 {
                     return;
@@ -94,8 +107,7 @@ namespace WarshipGirlsFinalTool
             responsestream.ReadByte();
             responsestream.ReadByte();
             var sr2 = new StreamReader(new DeflateStream(responsestream, CompressionMode.Decompress));
-            init_txt.text = sr2.ReadToEnd();
-            init_txt.Parse();
+            init_txt = CreateJsonText(sr2.ReadToEnd());
             var sw = new StreamWriter(@"documents\init.txt", false, Encoding.UTF8);
             sw.Write(init_txt.text);
             sw.Close();
@@ -112,9 +124,8 @@ namespace WarshipGirlsFinalTool
             if (File.Exists(@"documents\proj.manifest"))
             {
                 var sr = new StreamReader(@"documents\proj.manifest", Encoding.UTF8);
-                proj_manifest.text = sr.ReadToEnd();
+                proj_manifest = CreateJsonText(sr.ReadToEnd());
                 sr.Close();
-                proj_manifest.Parse();
                 packageUrl = (string)proj_manifest["packageUrl"];
                 if ((string)proj_manifest["version"] == (string)version_txt["ResVersion"])
                 {
@@ -129,59 +140,51 @@ namespace WarshipGirlsFinalTool
             var response = request.GetResponse() as HttpWebResponse;
             Stream responsestream = response.GetResponseStream();
             var sr2 = new StreamReader(responsestream, Encoding.UTF8);
-            proj_manifest.text = sr2.ReadToEnd();
-            proj_manifest.Parse();
+            proj_manifest = CreateJsonText(sr2.ReadToEnd());
             packageUrl = (string)proj_manifest["packageUrl"];
             var sw = new StreamWriter(@"documents\proj.manifest", false, Encoding.UTF8);
             sw.Write(proj_manifest.text);
             sw.Close();
 
-            //准备进度条对话框
-            var pd = new Pietschsoft.ProgressDialog(parentForm.Handle);
-            //准备进度条对话框
-            pd = new Pietschsoft.ProgressDialog(parentForm.Handle);
-            pd.Title = "检查游戏资源更新";
-            pd.CancelMessage = "正在取消...";
-            pd.Maximum = (uint) proj_manifest["hot"].Count();
-            pd.Value = 0;
-            pd.Line1 = "已完成0%";
-            pd.Line3 = "正在计算剩余时间...";
-
-            pd.ShowDialog(Pietschsoft.ProgressDialog.PROGDLG.Modal, Pietschsoft.ProgressDialog.PROGDLG.AutoTime, Pietschsoft.ProgressDialog.PROGDLG.NoMinimize);
-
             //接下来比较检查每个需要下载的文件
+            var filefilter = new string[]
+            {
+                @"ccbResources/model/",
+                @"ccbResources/ship_star_bg",
+                @"ccbResources/main_"
+            };
             var toDownload = from file2chk in proj_manifest["hot"]
                              where
-                                 (file2chk["name"].ToString().StartsWith(@"ccbResources/model/M_") ||
-                                 file2chk["name"].ToString().StartsWith(@"ccbResources/ship_star_bg")) &&
+                                 (from file in filefilter
+                                  where file2chk["name"].ToString().ToLower().StartsWith(file.ToLower())
+                                  select file
+                                     ).Any() &&
                                  (!File.Exists(@"documents\hot\" + file2chk["name"]) ||
                                   file2chk["size"].ToString() !=
                                   GetFileLength(@"documents\hot\" + file2chk["name"]).ToString() ||
                                   file2chk["md5"].ToString() !=
                                   GetMD5FromFile(@"documents\hot\" + file2chk["name"])
                                      )
-                             where pd.valueadd()
                              select new DownloadFile
                              {
                                  uri = packageUrl + file2chk["name"] + @"?md5=" + file2chk["md5"],
                                  filename = @"documents\hot\" + file2chk["name"],
                                  size = long.Parse((string)file2chk["size"])
                              };
-            pd.CloseDialog();
 
             long totalSize = toDownload.Sum(f => f.size);
 
             //准备进度条对话框
-            pd = new Pietschsoft.ProgressDialog(parentForm.Handle);
-            pd.Title = "下载游戏资源";
-            pd.CancelMessage = "正在取消...";
-            pd.Maximum = (uint)totalSize;
-            pd.Value = 0;
-            pd.Line1 = "开始下载...";
-            pd.Line3 = "正在计算剩余时间...";
-
+            var pd = new Pietschsoft.ProgressDialog(parentForm.Handle)
+            {
+                Title = "下载游戏资源",
+                CancelMessage = "正在取消...",
+                Maximum = (uint)totalSize,
+                Value = 0,
+                Line1 = "开始下载...",
+                Line3 = "正在计算剩余时间..."
+            };
             pd.ShowDialog(Pietschsoft.ProgressDialog.PROGDLG.Modal, Pietschsoft.ProgressDialog.PROGDLG.AutoTime, Pietschsoft.ProgressDialog.PROGDLG.NoMinimize);
-
             //开始下载
             long downloadedSize = 0;
             foreach (DownloadFile file in toDownload)
@@ -239,8 +242,7 @@ namespace WarshipGirlsFinalTool
             responsestream.ReadByte();
             responsestream.ReadByte();
             var sr = new StreamReader(new DeflateStream(responsestream, CompressionMode.Decompress));
-            passportLogin_txt.text = sr.ReadToEnd();
-            passportLogin_txt.Parse();
+            passportLogin_txt = CreateJsonText(sr.ReadToEnd());
             hf_skey = (string)passportLogin_txt["hf_skey"];
         }
 
@@ -267,14 +269,63 @@ namespace WarshipGirlsFinalTool
         public void login(int server)
         {
             gameServer = passportLogin_txt["serverList"][server]["host"].ToString().Replace(@"\/", @"/");
-            login_txt.text = StdGetRequest(@"/index/login/" + hf_skey.Split('.')[0]);
-            login_txt.Parse();
-
+            login_txt = CreateJsonText(
+                StdGetRequest(@"/index/login/" + hf_skey.Split('.')[0]));
         }
         public void initGame()
         {
-            gameinfo.text = StdGetRequest(@"api/initGame/");
-            gameinfo.Parse();
+            gameinfo = CreateJsonText(StdGetRequest(@"api/initGame/"));
+        }
+        /////////////////////////////////////////////////////////////////////
+        public enum ShipImageType { L, M, S }
+        public Image getShipImage(string shipID, ShipImageType type, bool hasBG)
+        {
+            var shipinfo = (from ship in gameinfo["userShipVO"]
+                             where ship["id"].ToString() == shipID
+                            select ship).First();
+            string shipModel;
+            if (shipinfo["skin_cid"].ToString() != "0")
+            {
+                shipModel = (from skin in init_txt["ShipSkin"]
+                                  where skin["cid"].ToString() ==
+                                        shipinfo["skin_cid"].ToString()
+                                  select skin["skinId"].ToString()).First();
+            }
+            else
+            {
+                shipModel = (from ship in init_txt["shipCard"]
+                                  where ship["cid"].ToString() ==
+                                        shipinfo["shipCid"].ToString()
+                                  select ship["picId"].ToString()).First();
+            }
+            if (double.Parse((string) shipinfo["battleProps"]["hp"])
+                < Math.Ceiling(double.Parse((string) shipinfo["battlePropsBasic"]["hp"])/2))
+            {
+                shipModel = "BROKEN_" + shipModel + ".muka";
+            }
+            else
+            {
+                shipModel = "NORMAL_" + shipModel + ".muka";
+            }
+            switch (type)
+            {
+                case ShipImageType.L:
+                    shipModel = @"documents\hot\ccbResources\model\L_" + shipModel;
+                    break;
+                case ShipImageType.M:
+                    shipModel = @"documents\hot\ccbResources\model\M_" + shipModel;
+                    break;
+                case ShipImageType.S:
+                    shipModel = @"documents\hot\ccbResources\model\S_" + shipModel;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+            if (!File.Exists(shipModel))
+            {
+                shipModel += "R";
+            }
+            return WSGPNG.getShipModel(shipModel);
         }
     }
 
@@ -283,11 +334,19 @@ namespace WarshipGirlsFinalTool
         public string text;
         public JObject obj;
 
+        public JsonText(string txt)
+        {
+            text = txt;
+            Parse();
+        }
+
         public JToken this[string index] => obj[index];
+
         public void Parse()
         {
             obj = JObject.Parse(text);
         }
+
         public override string ToString()
         {
             return obj.ToString();

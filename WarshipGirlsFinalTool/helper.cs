@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace WarshipGirlsFinalTool
 {
@@ -58,17 +59,6 @@ namespace WarshipGirlsFinalTool
             vDate = vDate.ToUniversalTime();
             DateTime dtZone = new DateTime(1970, 1, 1, 0, 0, 0);
             return (long)vDate.Subtract(dtZone).TotalMilliseconds;
-        }
-
-        public static bool valueadd(this Pietschsoft.ProgressDialog pd)
-        {
-            if (pd.HasUserCancelled)
-            {
-                throw new Exception("用户取消了下载！");
-            }
-            pd.Value++;
-            pd.Line2 = string.Format("已完成{0:0.00}%", 100*(double) pd.Value/(double) pd.Maximum);
-            return true;
         }
     }
 }

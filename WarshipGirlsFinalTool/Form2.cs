@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,6 +16,20 @@ namespace WarshipGirlsFinalTool
 {
     public partial class Form2 : Form
     {
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            if (BackgroundImage == null) base.OnPaintBackground(e);
+            else
+            {
+                e.Graphics.FillRectangle(new SolidBrush(BackColor), ClientRectangle);
+                int newWidth = ClientRectangle.Width;
+                int newHeight = (int)(BackgroundImage.Height *
+                                       ((double)ClientRectangle.Width / BackgroundImage.Width) + .5);
+                int newY = -(newHeight - ClientRectangle.Height)/2;
+                e.Graphics.DrawImage(BackgroundImage,
+                    new Rectangle(0, newY, newWidth, newHeight));
+            }
+        }
         
         public Warshipgirls conn;
         public Form1 form1;
@@ -32,38 +47,6 @@ namespace WarshipGirlsFinalTool
         private void Form2_Load(object sender, EventArgs e)
         {
             RefreshBasicData();
-            string secretaryID = conn.gameinfo["secretary"].ToString();
-            if (secretaryID == "0")
-            {
-                secretaryID = (from fleet in conn.gameinfo["fleetVo"]
-                    where fleet["id"].ToString() == "1"
-                    select fleet["ships"][0].ToString()).First();
-            }
-            var secretary = (from ship in conn.gameinfo["userShipVO"]
-                where ship["id"].ToString() == secretaryID
-                select ship).First();
-            string secretaryModel;
-            if (secretary["skin_cid"].ToString() != "0")
-            {
-                secretaryModel = (from skin in conn.init_txt["ShipSkin"]
-                    where skin["cid"].ToString() ==
-                          secretary["skin_cid"].ToString()
-                    select skin["skinId"].ToString()).First();
-            }
-            else
-            {
-                secretaryModel = (from ship in conn.init_txt["shipCard"]
-                    where ship["cid"].ToString() ==
-                          secretary["shipCid"].ToString()
-                    select ship["picId"].ToString()).First();
-            }
-            secretaryModel = @"documents\hot\ccbResources\model\M_NORMAL_"
-                             + secretaryModel + ".muka";
-            if (!File.Exists(secretaryModel))
-            {
-                secretaryModel += "R";
-            }
-            shipPic.Image = WSGPNG.getShipModel(secretaryModel);
         }
 
         private void RefreshBasicData()
@@ -75,6 +58,26 @@ namespace WarshipGirlsFinalTool
             textBox5.Text = (string) conn.gameinfo["userVo"]["ammo"];
             textBox6.Text = (string) conn.gameinfo["userVo"]["steel"];
             textBox7.Text = (string) conn.gameinfo["userVo"]["aluminium"];
+
+            if (DateTime.Now.TimeOfDay < new TimeSpan(6, 0, 0)
+                || DateTime.Now.TimeOfDay > new TimeSpan(18, 0, 0))
+            {
+                this.BackgroundImage = Image.FromFile(@"documents\hot\ccbResources\main_eve_bg.png");
+            }
+            else
+            {
+                this.BackgroundImage = Image.FromFile(@"documents\hot\ccbResources\main_light_bg.png");
+            }
+
+            string secretaryID = conn.gameinfo["secretary"].ToString();
+            if (secretaryID == "0")
+            {
+                secretaryID = (from fleet in conn.gameinfo["fleetVo"]
+                               where fleet["id"].ToString() == "1"
+                               select fleet["ships"][0].ToString()).First();
+            }
+            shipPic.Image = conn.getShipImage(secretaryID,
+                Warshipgirls.ShipImageType.L, false);
         }
 
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)
@@ -85,7 +88,7 @@ namespace WarshipGirlsFinalTool
 
         private void Form2_Resize(object sender, EventArgs e)
         {
-            if(this.WindowState==FormWindowState.Minimized)
+            if (this.WindowState == FormWindowState.Minimized)
                 this.Hide();
         }
 
