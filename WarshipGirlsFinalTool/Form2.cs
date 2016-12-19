@@ -47,6 +47,7 @@ namespace WarshipGirlsFinalTool
         private void Form2_Load(object sender, EventArgs e)
         {
             RefreshBasicData();
+            setLanguage(this);
         }
 
         private void RefreshBasicData()
@@ -78,6 +79,55 @@ namespace WarshipGirlsFinalTool
             }
             shipPic.Image = conn.getShipImage(secretaryID,
                 Warshipgirls.ShipImageType.L, false);
+
+
+            Image main_source_frame1 = conn.imageFinder.getImage("main_source_frame1.png");
+            Image main_source_frame2 = conn.imageFinder.getImage("main_source_frame2.png");
+            Image main_source_frame3 = conn.imageFinder.getImage("main_source_frame3.png");
+            Image main_source_1 = conn.imageFinder.getImage("main_source_1.png");//弹
+            Image main_source_2 = conn.imageFinder.getImage("main_source_2.png");//钢
+            Image main_source_3 = conn.imageFinder.getImage("main_source_3.png");//铝
+            Image main_source_4 = conn.imageFinder.getImage("main_source_4.png");//油
+            Bitmap main_source_frame_bitmap = 
+                new Bitmap(
+                    main_source_frame1.Width + 
+                    main_source_frame2.Width*2+
+                    main_source_frame3.Width, 
+                    Math.Max(Math.Max(main_source_frame1.Height,
+                    main_source_frame2.Height), 
+                    main_source_frame3.Height));
+
+            using (Graphics g = Graphics.FromImage(main_source_frame_bitmap))
+            {
+                //油
+                g.DrawImage(main_source_frame1, 0, 0);
+                g.DrawImage(main_source_4, 0, 0);
+                //弹
+                g.DrawImage(main_source_frame2, main_source_frame1.Width, 0);
+                g.DrawImage(main_source_1, main_source_frame1.Width, 0);
+                //钢
+                g.DrawImage(main_source_frame2, 
+                    main_source_frame1.Width+ main_source_frame2.Width, 0);
+                g.DrawImage(main_source_2,
+                    main_source_frame1.Width + main_source_frame2.Width, 0);
+                //铝
+                g.DrawImage(main_source_frame3,
+                    main_source_frame1.Width + main_source_frame2.Width*2, 0);
+                g.DrawImage(main_source_3,
+                    main_source_frame1.Width + main_source_frame2.Width * 2, 0);
+            }
+
+            main_source_frame.Image = main_source_frame_bitmap;
+        }
+        private void setLanguage(Control parent)
+        {
+            foreach (Control ctrl in parent.Controls)
+            {
+                if (ctrl is Label)
+                    ((Label) ctrl).Text = conn.getLangStr(((Label) ctrl).Text);
+                else
+                    setLanguage(ctrl);
+            }
         }
 
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)
@@ -125,12 +175,33 @@ namespace WarshipGirlsFinalTool
                     else
                     {
                         if (explorestate[fleetId] != ExploreState.finshed)
-                            form1.notice(2000, "远征提醒", string.Format("第{0}舰队的远征完成了！", fleetId), ToolTipIcon.Info);
+                            form1.notice(2000, conn.getLangStr("HasFinishedPVEExplore"),
+                                string.Format(conn.getLangStr("ExpeditionCompleted")
+                                .Replace("%d", "{0}").Replace("%s", "{1}"), fleetId, "???"),
+                                ToolTipIcon.Info);
                         explorestate[fleetId] = ExploreState.finshed;
-                        explore[fleetId].Text = "完成！";
+                        explore[fleetId].Text = conn.getLangStr("HasFinishedPVEExplore");
                     }
                 }
             }  
+        }
+
+        private void Form2_Activated(object sender, EventArgs e)
+        {
+            if (DateTime.Now.TimeOfDay < new TimeSpan(6, 0, 0)
+                || DateTime.Now.TimeOfDay > new TimeSpan(18, 0, 0))
+            {
+                conn.music.play("port-night.mp3", false);
+            }
+            else
+            {
+                conn.music.play("port-day.mp3", false);
+            }
+        }
+
+        private void Form2_Deactivate(object sender, EventArgs e)
+        {
+            conn.music.stop();
         }
     }
 }

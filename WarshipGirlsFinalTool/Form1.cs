@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
+using WarshipGirlsPNGTool;
 
 namespace WarshipGirlsFinalTool
 {
@@ -40,7 +41,7 @@ namespace WarshipGirlsFinalTool
             {
                 conn = new Warshipgirls
                 {
-                    version = @"2.7.0",
+                    version = @"2.8.0",
                     username = Username.Text,
                     password = Password.Text,
                 };
@@ -48,7 +49,7 @@ namespace WarshipGirlsFinalTool
                 {
                     conn.firstSever = @"http://version.jr.moefantasy.com/";
                     conn.market = 3;
-                    conn.channel = 2;
+                    conn.channel = 1;
                 }
                 else if (Android.Checked)
                 {
@@ -66,6 +67,7 @@ namespace WarshipGirlsFinalTool
                 {
                     throw new Exception("Please Choose a Server!");
                 }
+                conn.Language = Warshipgirls.LANG.SChinese;
                 conn.checkVer();
                 conn.getInitConfigs();
                 conn.downloadRes(this);

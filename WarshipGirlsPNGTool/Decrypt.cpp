@@ -4,12 +4,10 @@
 #include "IceKey.h"
 #include "CRC32.h"
 
-//#include <Winsock2.h>
 #include <memory>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <boost/algorithm/string.hpp>
 
 #include <msclr\marshal_cppstd.h>
 
@@ -146,8 +144,14 @@ stringstream DecryptMukaR(string filename)
 {
 
 	IceKey icekey(0);
+	auto foundPos = filename.find_last_of(".");
+	if(string::npos==foundPos)
+	{
+		throw gcnew Exception(marshal_as<String^>(filename + "不是合法的文件名！"));
+	}
 
-	std::string keyword = boost::replace_last_copy(filename, ".mukaR", "");
+	string keyword = filename.substr(0, foundPos);
+
 	auto md5input = Encoding::UTF8->GetBytes(marshal_as<String^>("Zhanjian") 
 		+ Path::GetFileName(marshal_as<String^>(keyword)));
 	auto md5 = gcnew MD5CryptoServiceProvider();

@@ -52,8 +52,10 @@
             this.label8 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.shipPic = new System.Windows.Forms.PictureBox();
+            this.main_source_frame = new System.Windows.Forms.PictureBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.shipPic)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.main_source_frame)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -62,9 +64,9 @@
             this.label1.Font = new System.Drawing.Font("宋体", 11F);
             this.label1.Location = new System.Drawing.Point(24, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(104, 19);
+            this.label1.Size = new System.Drawing.Size(159, 19);
             this.label1.TabIndex = 0;
-            this.label1.Text = "提督姓名：";
+            this.label1.Text = "UI_SelfInfoTip1";
             // 
             // label2
             // 
@@ -72,9 +74,9 @@
             this.label2.Font = new System.Drawing.Font("宋体", 11F);
             this.label2.Location = new System.Drawing.Point(24, 49);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(66, 19);
+            this.label2.Size = new System.Drawing.Size(219, 19);
             this.label2.TabIndex = 1;
-            this.label2.Text = "等级：";
+            this.label2.Text = "LeaderBoardUserLevel2";
             // 
             // label3
             // 
@@ -82,9 +84,9 @@
             this.label3.Font = new System.Drawing.Font("宋体", 11F);
             this.label3.Location = new System.Drawing.Point(206, 49);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(66, 19);
+            this.label3.Size = new System.Drawing.Size(99, 19);
             this.label3.TabIndex = 2;
-            this.label3.Text = "经验：";
+            this.label3.Text = "Resource6";
             // 
             // label4
             // 
@@ -92,9 +94,9 @@
             this.label4.Font = new System.Drawing.Font("宋体", 11F);
             this.label4.Location = new System.Drawing.Point(24, 123);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(47, 19);
+            this.label4.Size = new System.Drawing.Size(99, 19);
             this.label4.TabIndex = 3;
-            this.label4.Text = "油：";
+            this.label4.Text = "Resource2";
             // 
             // label5
             // 
@@ -102,9 +104,9 @@
             this.label5.Font = new System.Drawing.Font("宋体", 11F);
             this.label5.Location = new System.Drawing.Point(189, 123);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(47, 19);
+            this.label5.Size = new System.Drawing.Size(99, 19);
             this.label5.TabIndex = 4;
-            this.label5.Text = "弹：";
+            this.label5.Text = "Resource3";
             // 
             // label6
             // 
@@ -112,9 +114,9 @@
             this.label6.Font = new System.Drawing.Font("宋体", 11F);
             this.label6.Location = new System.Drawing.Point(24, 174);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(47, 19);
+            this.label6.Size = new System.Drawing.Size(99, 19);
             this.label6.TabIndex = 5;
-            this.label6.Text = "钢：";
+            this.label6.Text = "Resource4";
             // 
             // label7
             // 
@@ -122,13 +124,13 @@
             this.label7.Font = new System.Drawing.Font("宋体", 11F);
             this.label7.Location = new System.Drawing.Point(189, 174);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(47, 19);
+            this.label7.Size = new System.Drawing.Size(99, 19);
             this.label7.TabIndex = 6;
-            this.label7.Text = "铝：";
+            this.label7.Text = "Resource9";
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(120, 8);
+            this.textBox1.Location = new System.Drawing.Point(172, 8);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.Size = new System.Drawing.Size(100, 25);
@@ -136,7 +138,7 @@
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(82, 48);
+            this.textBox2.Location = new System.Drawing.Point(100, 48);
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
             this.textBox2.Size = new System.Drawing.Size(100, 25);
@@ -253,12 +255,21 @@
             // shipPic
             // 
             this.shipPic.BackColor = System.Drawing.Color.Transparent;
-            this.shipPic.Location = new System.Drawing.Point(494, 44);
+            this.shipPic.Location = new System.Drawing.Point(498, 110);
             this.shipPic.Name = "shipPic";
-            this.shipPic.Size = new System.Drawing.Size(567, 554);
+            this.shipPic.Size = new System.Drawing.Size(778, 675);
             this.shipPic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.shipPic.TabIndex = 15;
             this.shipPic.TabStop = false;
+            // 
+            // main_source_frame
+            // 
+            this.main_source_frame.BackColor = System.Drawing.Color.Transparent;
+            this.main_source_frame.Location = new System.Drawing.Point(550, 18);
+            this.main_source_frame.Name = "main_source_frame";
+            this.main_source_frame.Size = new System.Drawing.Size(647, 86);
+            this.main_source_frame.TabIndex = 16;
+            this.main_source_frame.TabStop = false;
             // 
             // Form2
             // 
@@ -267,6 +278,7 @@
             this.BackColor = System.Drawing.Color.White;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(1582, 853);
+            this.Controls.Add(this.main_source_frame);
             this.Controls.Add(this.shipPic);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.textBox7);
@@ -287,12 +299,15 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form2";
             this.Text = "Form2";
+            this.Activated += new System.EventHandler(this.Form2_Activated);
+            this.Deactivate += new System.EventHandler(this.Form2_Deactivate);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form2_FormClosed);
             this.Load += new System.EventHandler(this.Form2_Load);
             this.Resize += new System.EventHandler(this.Form2_Resize);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.shipPic)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.main_source_frame)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -322,5 +337,6 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.PictureBox shipPic;
+        private System.Windows.Forms.PictureBox main_source_frame;
     }
 }
