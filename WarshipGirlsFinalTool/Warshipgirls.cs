@@ -47,7 +47,7 @@ namespace WarshipGirlsFinalTool
             }
         }
 
-        private const string device = @"Lone Wolf PC Client/0.0.3 (Windows 10) https://github.com/lone-wolf-akela/WarshipGirlsTool";
+        private const string device = @"Lone Wolf PC Client/0.0.4 (Windows 10) https://github.com/lone-wolf-akela/WarshipGirlsTool";
 
         private XmlDocument language_xml;
 
@@ -65,8 +65,7 @@ namespace WarshipGirlsFinalTool
         private string packageUrl;
         private string uriend()
         {
-            return string.Format("&market={0}&channel={1}&version={2}",
-                market, channel, version);
+            return $"&market={market}&channel={channel}&version={version}";
         }
 
         private JsonText CreateJsonText(string text)
@@ -81,8 +80,7 @@ namespace WarshipGirlsFinalTool
 
         public void checkVer()
         {
-            string uri = string.Format("{0}index/checkVer/{1}/{2}/{3}{4}",
-                firstSever, version, market, channel, uriend());
+            string uri = $"{firstSever}index/checkVer/{version}/{market}/{channel}{uriend()}";
             var request = WebRequest.Create(uri) as HttpWebRequest;
             request.Method = @"GET";
             request.ProtocolVersion = new Version(1, 1);
@@ -265,8 +263,7 @@ namespace WarshipGirlsFinalTool
 
         private string StdGetRequest(string command)
         {
-            string uri = string.Format("{0}{1}&t={2}&e={3}&gz=1{4}",
-                gameServer, command, DateTime.Now.ToUTC(), helper.GetNewUDID(), uriend());
+            string uri = $"{gameServer}{command}&t={DateTime.Now.ToUTC()}&e={GetNewUDID()}&gz=1{uriend()}";
             var request = WebRequest.Create(uri) as HttpWebRequest;
             request.Method = @"GET";
             request.ProtocolVersion = new Version(1, 1);
@@ -295,6 +292,44 @@ namespace WarshipGirlsFinalTool
             gameinfo = CreateJsonText(StdGetRequest(@"api/initGame/"));
         }
 
+        public void explore_getResult(string expID)
+        {
+            JsonText Res = CreateJsonText(StdGetRequest($"explore/getResult/{expID}/"));
+            //TODO:BigSuccess
+            foreach(var taskUpdate in Res["updateTaskVo"])
+            {
+                var taskCondition = from task in gameinfo["taskVo"]
+                    where (string) task["taskCid"] == (string) taskUpdate["taskCid"]
+                    select task;
+                taskCondition.First()["condition"] = taskUpdate["condition"];
+            }
+            //TODO:Lovechange
+            var mergeSettings = new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Union
+            };            
+            ((JObject) gameinfo["userVo"]).Merge(Res["userLevelVo"], mergeSettings);
+            //((JObject)gameinfo["detailInfo"]).Merge(Res["userLevelVo"], mergeSettings);
+            ((JObject)gameinfo["userVo"]).Merge(Res["userResVo"], mergeSettings);
+            //TODO:newAward?
+            /*
+             *   "newAward": {
+                "2": 800,           2:油 3:弹 4:钢 9:铝
+                "6": 210            6:经验
+              },*/
+            gameinfo["pveExploreVo"] = Res["pveExploreVo"];
+            gameinfo["detailInfo"] = Res["detailInfo"];
+            //equipmentDockVo
+            gameinfo["fleetVo"] = Res["fleetVo"];
+        }
+
+        public void explore_cancel(string expID)
+        {
+            JsonText Res = CreateJsonText(StdGetRequest($"explore/cancel/{expID}/"));
+            //status?
+            gameinfo["pveExploreVo"] = Res["pveExploreVo"];
+            gameinfo["fleetVo"] = Res["fleetVo"];
+        }
         /////////////////////////////////////////////////////////////////////
         public enum ShipImageType
         {
@@ -373,7 +408,11 @@ namespace WarshipGirlsFinalTool
             Parse();
         }
 
-        public JToken this[string index] => obj[index];
+        public JToken this[string index]
+        {
+            get { return obj[index]; }
+            set { obj[index] = value; }
+        } 
 
         public void Parse()
         {

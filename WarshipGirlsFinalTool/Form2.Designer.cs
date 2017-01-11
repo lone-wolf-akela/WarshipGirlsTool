@@ -33,27 +33,13 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
-            this.textBox4 = new System.Windows.Forms.TextBox();
-            this.textBox5 = new System.Windows.Forms.TextBox();
-            this.textBox6 = new System.Windows.Forms.TextBox();
-            this.textBox7 = new System.Windows.Forms.TextBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.explore4 = new System.Windows.Forms.Label();
-            this.explore3 = new System.Windows.Forms.Label();
-            this.explore2 = new System.Windows.Forms.Label();
-            this.explore1 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.shipPic = new System.Windows.Forms.PictureBox();
             this.main_source_frame = new System.Windows.Forms.PictureBox();
-            this.panel1.SuspendLayout();
+            this.btnDock = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.shipPic)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.main_source_frame)).BeginInit();
             this.SuspendLayout();
@@ -88,46 +74,6 @@
             this.label3.TabIndex = 2;
             this.label3.Text = "Resource6";
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("宋体", 11F);
-            this.label4.Location = new System.Drawing.Point(24, 123);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(99, 19);
-            this.label4.TabIndex = 3;
-            this.label4.Text = "Resource2";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("宋体", 11F);
-            this.label5.Location = new System.Drawing.Point(189, 123);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(99, 19);
-            this.label5.TabIndex = 4;
-            this.label5.Text = "Resource3";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("宋体", 11F);
-            this.label6.Location = new System.Drawing.Point(24, 174);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(99, 19);
-            this.label6.TabIndex = 5;
-            this.label6.Text = "Resource4";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("宋体", 11F);
-            this.label7.Location = new System.Drawing.Point(189, 174);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(99, 19);
-            this.label7.TabIndex = 6;
-            this.label7.Text = "Resource9";
-            // 
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(172, 8);
@@ -138,7 +84,7 @@
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(100, 48);
+            this.textBox2.Location = new System.Drawing.Point(100, 43);
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
             this.textBox2.Size = new System.Drawing.Size(100, 25);
@@ -146,105 +92,11 @@
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(278, 49);
+            this.textBox3.Location = new System.Drawing.Point(311, 48);
             this.textBox3.Name = "textBox3";
             this.textBox3.ReadOnly = true;
             this.textBox3.Size = new System.Drawing.Size(100, 25);
             this.textBox3.TabIndex = 9;
-            // 
-            // textBox4
-            // 
-            this.textBox4.Location = new System.Drawing.Point(65, 122);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.ReadOnly = true;
-            this.textBox4.Size = new System.Drawing.Size(100, 25);
-            this.textBox4.TabIndex = 10;
-            // 
-            // textBox5
-            // 
-            this.textBox5.Location = new System.Drawing.Point(229, 123);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.ReadOnly = true;
-            this.textBox5.Size = new System.Drawing.Size(100, 25);
-            this.textBox5.TabIndex = 11;
-            // 
-            // textBox6
-            // 
-            this.textBox6.Location = new System.Drawing.Point(65, 173);
-            this.textBox6.Name = "textBox6";
-            this.textBox6.ReadOnly = true;
-            this.textBox6.Size = new System.Drawing.Size(100, 25);
-            this.textBox6.TabIndex = 12;
-            // 
-            // textBox7
-            // 
-            this.textBox7.Location = new System.Drawing.Point(229, 173);
-            this.textBox7.Name = "textBox7";
-            this.textBox7.ReadOnly = true;
-            this.textBox7.Size = new System.Drawing.Size(100, 25);
-            this.textBox7.TabIndex = 13;
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.explore4);
-            this.panel1.Controls.Add(this.explore3);
-            this.panel1.Controls.Add(this.explore2);
-            this.panel1.Controls.Add(this.explore1);
-            this.panel1.Controls.Add(this.label8);
-            this.panel1.Location = new System.Drawing.Point(36, 233);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(293, 152);
-            this.panel1.TabIndex = 14;
-            // 
-            // explore4
-            // 
-            this.explore4.AutoSize = true;
-            this.explore4.Font = new System.Drawing.Font("宋体", 11F);
-            this.explore4.Location = new System.Drawing.Point(32, 118);
-            this.explore4.Name = "explore4";
-            this.explore4.Size = new System.Drawing.Size(47, 19);
-            this.explore4.TabIndex = 4;
-            this.explore4.Text = "空闲";
-            // 
-            // explore3
-            // 
-            this.explore3.AutoSize = true;
-            this.explore3.Font = new System.Drawing.Font("宋体", 11F);
-            this.explore3.Location = new System.Drawing.Point(32, 91);
-            this.explore3.Name = "explore3";
-            this.explore3.Size = new System.Drawing.Size(47, 19);
-            this.explore3.TabIndex = 3;
-            this.explore3.Text = "空闲";
-            // 
-            // explore2
-            // 
-            this.explore2.AutoSize = true;
-            this.explore2.Font = new System.Drawing.Font("宋体", 11F);
-            this.explore2.Location = new System.Drawing.Point(32, 64);
-            this.explore2.Name = "explore2";
-            this.explore2.Size = new System.Drawing.Size(47, 19);
-            this.explore2.TabIndex = 2;
-            this.explore2.Text = "空闲";
-            // 
-            // explore1
-            // 
-            this.explore1.AutoSize = true;
-            this.explore1.Font = new System.Drawing.Font("宋体", 11F);
-            this.explore1.Location = new System.Drawing.Point(32, 39);
-            this.explore1.Name = "explore1";
-            this.explore1.Size = new System.Drawing.Size(47, 19);
-            this.explore1.TabIndex = 1;
-            this.explore1.Text = "空闲";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("宋体", 11F);
-            this.label8.Location = new System.Drawing.Point(16, 13);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(66, 19);
-            this.label8.TabIndex = 0;
-            this.label8.Text = "远征：";
             // 
             // timer1
             // 
@@ -255,9 +107,9 @@
             // shipPic
             // 
             this.shipPic.BackColor = System.Drawing.Color.Transparent;
-            this.shipPic.Location = new System.Drawing.Point(498, 110);
+            this.shipPic.Location = new System.Drawing.Point(28, 205);
             this.shipPic.Name = "shipPic";
-            this.shipPic.Size = new System.Drawing.Size(778, 675);
+            this.shipPic.Size = new System.Drawing.Size(882, 823);
             this.shipPic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.shipPic.TabIndex = 15;
             this.shipPic.TabStop = false;
@@ -265,11 +117,33 @@
             // main_source_frame
             // 
             this.main_source_frame.BackColor = System.Drawing.Color.Transparent;
-            this.main_source_frame.Location = new System.Drawing.Point(550, 18);
+            this.main_source_frame.Location = new System.Drawing.Point(548, 0);
             this.main_source_frame.Name = "main_source_frame";
-            this.main_source_frame.Size = new System.Drawing.Size(647, 86);
+            this.main_source_frame.Size = new System.Drawing.Size(207, 86);
+            this.main_source_frame.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.main_source_frame.TabIndex = 16;
             this.main_source_frame.TabStop = false;
+            // 
+            // btnDock
+            // 
+            this.btnDock.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnDock.BackColor = System.Drawing.Color.Transparent;
+            this.btnDock.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnDock.BackgroundImage")));
+            this.btnDock.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.btnDock.FlatAppearance.BorderSize = 0;
+            this.btnDock.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
+            this.btnDock.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+            this.btnDock.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDock.ForeColor = System.Drawing.Color.Transparent;
+            this.btnDock.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.btnDock.Location = new System.Drawing.Point(1076, 177);
+            this.btnDock.Name = "btnDock";
+            this.btnDock.Size = new System.Drawing.Size(200, 200);
+            this.btnDock.TabIndex = 5;
+            this.btnDock.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.btnDock.UseMnemonic = false;
+            this.btnDock.UseVisualStyleBackColor = false;
+            this.btnDock.Click += new System.EventHandler(this.btnDock_Click);
             // 
             // Form2
             // 
@@ -278,20 +152,12 @@
             this.BackColor = System.Drawing.Color.White;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(1582, 853);
+            this.Controls.Add(this.btnDock);
             this.Controls.Add(this.main_source_frame);
             this.Controls.Add(this.shipPic);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.textBox7);
-            this.Controls.Add(this.textBox6);
-            this.Controls.Add(this.textBox5);
-            this.Controls.Add(this.textBox4);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -303,9 +169,8 @@
             this.Deactivate += new System.EventHandler(this.Form2_Deactivate);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form2_FormClosed);
             this.Load += new System.EventHandler(this.Form2_Load);
+            this.ResizeEnd += new System.EventHandler(this.Form2_ResizeEnd);
             this.Resize += new System.EventHandler(this.Form2_Resize);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.shipPic)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.main_source_frame)).EndInit();
             this.ResumeLayout(false);
@@ -318,25 +183,12 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.TextBox textBox4;
-        private System.Windows.Forms.TextBox textBox5;
-        private System.Windows.Forms.TextBox textBox6;
-        private System.Windows.Forms.TextBox textBox7;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label explore4;
-        private System.Windows.Forms.Label explore3;
-        private System.Windows.Forms.Label explore2;
-        private System.Windows.Forms.Label explore1;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.PictureBox shipPic;
         private System.Windows.Forms.PictureBox main_source_frame;
+        private System.Windows.Forms.Button btnDock;
     }
 }

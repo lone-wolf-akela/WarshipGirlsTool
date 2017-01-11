@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -21,6 +22,9 @@ namespace WarshipGirlsFinalTool
         private Warshipgirls conn;
 
         public bool ingame = false;
+        public PrivateFontCollection DejaVuSansMono = new PrivateFontCollection();
+        public PrivateFontCollection CloudYuanCuGBK = new PrivateFontCollection();
+        public PrivateFontCollection msyhbd = new PrivateFontCollection();
         public void notice(int timeout,string title,string text, ToolTipIcon icon)
         {
             this.notifyIcon1.ShowBalloonTip(timeout, title, text, icon);
@@ -32,7 +36,9 @@ namespace WarshipGirlsFinalTool
             Username.Text = configini.Read("USERNAME", "Account");
             Password.Text = configini.Read("PASSWORD", "Account");
 
-            Directory.CreateDirectory("documents");
+            DejaVuSansMono.AddFontFile(@"documents\font\DejaVuSansMono.ttf");
+            CloudYuanCuGBK.AddFontFile(@"documents\font\CloudYuanCuGBK.ttf");
+            msyhbd.AddFontFile(@"documents\font\msyhbd.ttf");
         }
 
         private void button1_Click(object sender, EventArgs e)

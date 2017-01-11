@@ -59,6 +59,49 @@ namespace WarshipGirlsFinalTool
             StrFormatByteSize(filesize, sb, sb.Capacity);
             return sb.ToString();
         }
+
+        //From https://adamprescott.net/2012/03/02/custom-shaped-windows-forms-from-images/
+        public static Region GetRegionFromImg(Bitmap _img)
+        {
+            var rgn = new Region();
+            rgn.MakeEmpty();
+            var rc = new Rectangle(0, 0, 0, 0);
+            bool inimage = false;
+            for (int y = 0; y < _img.Height; y++)
+            {
+                for (int x = 0; x < _img.Width; x++)
+                {
+                    if (!inimage)
+                    {
+                        // if pixel is not transparent
+                        if (_img.GetPixel(x, y).A != 0)
+                        {
+                            inimage = true;
+                            rc.X = x;
+                            rc.Y = y;
+                            rc.Height = 1;
+                        }
+                    }
+                    else
+                    {
+                        // if pixel is transparent
+                        if (_img.GetPixel(x, y).A == 0)
+                        {
+                            inimage = false;
+                            rc.Width = x - rc.X;
+                            rgn.Union(rc);
+                        }
+                    }
+                }
+                if (inimage)
+                {
+                    inimage = false;
+                    rc.Width = _img.Width - rc.X;
+                    rgn.Union(rc);
+                }
+            }
+            return rgn;
+        }
     }
     internal static class Extension
     {
@@ -76,11 +119,13 @@ namespace WarshipGirlsFinalTool
         {
             if (isPlaying != music)
             {
-                stop();
+                if(isPlaying!="")
+                    stop();
                 isPlaying = music;
                 audioFile = new LoopStream(new AudioFileReader(@"documents\hot\audio\" + music));
                 if (!fromBegin && timeRecord.ContainsKey(music))
                     audioFile.Position = timeRecord[music];
+                waveOutDevice=new WaveOut();
                 waveOutDevice.Init(audioFile);
                 waveOutDevice.Play();
             }
@@ -94,16 +139,16 @@ namespace WarshipGirlsFinalTool
         {
             if (isPlaying != "")
             {
-                timeRecord[isPlaying] = audioFile.Position;
-                waveOutDevice.Stop();
+                timeRecord[isPlaying] = audioFile.Position;               
                 isPlaying = "";
-            }
+                waveOutDevice.Stop();
+            }           
         }
 
         private readonly Dictionary<string, long> timeRecord = new Dictionary<string, long>();
         private string isPlaying = "";
 
-        private readonly IWavePlayer waveOutDevice = new WaveOut();
+        private IWavePlayer waveOutDevice;
         private LoopStream audioFile;
 
         /// <summary>
@@ -113,7 +158,6 @@ namespace WarshipGirlsFinalTool
         private class LoopStream : WaveStream
         {
             private readonly WaveStream sourceStream;
-
             /// <summary>
             /// Creates a new Loop stream
             /// </summary>
@@ -124,7 +168,6 @@ namespace WarshipGirlsFinalTool
                 this.sourceStream = sourceStream;
                 this.EnableLooping = true;
             }
-
             /// <summary>
             /// Use this to turn looping on or off
             /// </summary>
