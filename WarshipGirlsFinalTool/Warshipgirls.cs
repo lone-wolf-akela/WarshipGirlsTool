@@ -292,35 +292,49 @@ namespace WarshipGirlsFinalTool
             gameinfo = CreateJsonText(StdGetRequest(@"api/initGame/"));
         }
 
-        public void explore_getResult(string expID)
+        public JsonText explore_getResult(string expID)
         {
             JsonText Res = CreateJsonText(StdGetRequest($"explore/getResult/{expID}/"));
-            //TODO:BigSuccess
-            foreach(var taskUpdate in Res["updateTaskVo"])
+            if (Res["updateTaskVo"] != null)
             {
-                var taskCondition = from task in gameinfo["taskVo"]
-                    where (string) task["taskCid"] == (string) taskUpdate["taskCid"]
-                    select task;
-                taskCondition.First()["condition"] = taskUpdate["condition"];
+                foreach (var taskUpdate in Res["updateTaskVo"])
+                {
+                    var taskCondition = from task in gameinfo["taskVo"]
+                        where (string) task["taskCid"] == (string) taskUpdate["taskCid"]
+                        select task;
+                    taskCondition.First()["condition"] = taskUpdate["condition"];
+                }
             }
-            //TODO:Lovechange
+            //loveChange
+            //$intimacyOther ????
+            //rewardItems
             var mergeSettings = new JsonMergeSettings
             {
                 MergeArrayHandling = MergeArrayHandling.Union
             };            
             ((JObject) gameinfo["userVo"]).Merge(Res["userLevelVo"], mergeSettings);
             //((JObject)gameinfo["detailInfo"]).Merge(Res["userLevelVo"], mergeSettings);
+            JToken packageVo;
+            if (Res.obj.TryGetValue("packageVo", out packageVo))
+            {
+                foreach (var itemnew in packageVo)
+                {
+                    var iteminfo = from itemold in gameinfo["packageVo"]
+                                   where (string)itemold["itemCid"] == (string)itemnew["itemCid"]
+                                   select itemold;
+                    if (iteminfo.Any())
+                        iteminfo.First()["num"] = itemnew["num"];
+                    else
+                        ((JArray)gameinfo["packageVo"]).Add(itemnew);
+                }
+            }
             ((JObject)gameinfo["userVo"]).Merge(Res["userResVo"], mergeSettings);
-            //TODO:newAward?
-            /*
-             *   "newAward": {
-                "2": 800,           2:油 3:弹 4:钢 9:铝
-                "6": 210            6:经验
-              },*/
+            //newAward
             gameinfo["pveExploreVo"] = Res["pveExploreVo"];
             gameinfo["detailInfo"] = Res["detailInfo"];
-            //equipmentDockVo
+            //shipVO
             gameinfo["fleetVo"] = Res["fleetVo"];
+            return Res;
         }
 
         public void explore_cancel(string expID)
@@ -391,6 +405,30 @@ namespace WarshipGirlsFinalTool
             {
                 return str;
             }
+        }
+
+        public string getCidText(int cid)
+        {
+            if (cid == -1)
+                return "随机物品";
+
+            //1钻石,2燃料,3弹药,4钢材,5建材?,6经验,7船体力,8船经验,9铝材
+            if (cid >= 1 && cid <= 9)
+                return getLangStr("Resource" + cid);
+
+            //141快速建造,241建造蓝图,541快速修理,66641损害管理,741装备蓝图,88841誓约之戒
+            if (getLangStr("Item" + cid) != "Item" + cid)
+                return getLangStr("Item" + cid);
+
+            //船只
+            var shipTitle = from ship in init_txt["shipCard"]
+                where (string) ship["cid"] == cid.ToString()
+                select (string) ship["title"];
+            if (shipTitle.Any())
+                return shipTitle.First();
+
+            throw new ArgumentOutOfRangeException();
+
         }
         /////////////////////////////////////////////////////////////////////
         public readonly Music music=new Music();

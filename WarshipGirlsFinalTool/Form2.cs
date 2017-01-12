@@ -71,11 +71,11 @@ namespace WarshipGirlsFinalTool
             btnDock.Region = helper.GetRegionFromImg(new Bitmap(imageRes["main_btn_sheep"]));
             btnDock.MouseDown += (sender, e) =>
             {
-                ((Button) sender).BackgroundImage = imageRes["main_btn_sheep_g"];
+                ((Button)sender).BackgroundImage = imageRes["main_btn_sheep_g"];
             };
             btnDock.MouseUp += (sender, e) =>
             {
-                ((Button) sender).BackgroundImage = imageRes["main_btn_sheep"];
+                ((Button)sender).BackgroundImage = imageRes["main_btn_sheep"];
             };
 
         }
@@ -193,7 +193,11 @@ namespace WarshipGirlsFinalTool
         private void Form2_Resize(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Minimized)
+            {
+                form3?.Close();
+                form3 = null;
                 this.Hide();
+            }
         }
 
         private enum ExploreState
@@ -218,6 +222,10 @@ namespace WarshipGirlsFinalTool
                 }
                 else
                 {
+                    string exploreTitle = (from expinfo in conn.init_txt["pveExplore"]
+                                       where (string)expinfo["id"] == (string)info.First()["exploreId"]
+                                       select (string)expinfo["title"]).First();
+
                     int time = (int)(long.Parse((string)info.First()["endTime"])
                         - DateTime.Now.ToUTC() / 1000);
                     if (time >= 0)
@@ -229,7 +237,7 @@ namespace WarshipGirlsFinalTool
                         if (explorestate[fleetId] != ExploreState.finshed)
                             form1.notice(2000, conn.getLangStr("HasFinishedPVEExplore"),
                                 string.Format(conn.getLangStr("ExpeditionCompleted")
-                                .Replace("%d", "{0}").Replace("%s", "{1}"), fleetId, "???"),
+                                .Replace("%d", "{0}").Replace("%s", "{1}"), fleetId, exploreTitle),
                                 ToolTipIcon.Info);
                         explorestate[fleetId] = ExploreState.finshed;
                     }
@@ -258,7 +266,7 @@ namespace WarshipGirlsFinalTool
         private void btnDock_Click(object sender, EventArgs e)
         {
             if (form3 == null)
-                form3 = new Form3 {conn = conn, form1 = form1, form2 = this};
+                form3 = new Form3 { conn = conn, form1 = form1, form2 = this };
             form3.Show();
             form3.Focus();
         }
