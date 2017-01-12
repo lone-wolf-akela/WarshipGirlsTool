@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
+//From http://pietschsoft.com/post/2009/08/17/CSharp-IProgressDialog-Show-Native-Progress-Dialog-from-dotNet-in-Windows
 namespace Pietschsoft
 {
     public class ProgressDialog
