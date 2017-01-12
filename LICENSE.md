@@ -1,4 +1,4 @@
-MIT License
+#MIT License
 
 Copyright (c) 2016 lone-wolf-akela
 
@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-MIT 开源许可协议
+#MIT 开源许可协议
 
 版权所有 (c) 2016 lone-wolf-akela
 
@@ -32,3 +32,16 @@ MIT 开源许可协议
 该软件是"按原样"提供的，没有任何形式的明示或暗示，包括但不限于为特定目的和不侵权的适销
 性和适用性的保证担保。在任何情况下，作者或版权持有人，都无权要求任何索赔，或有关损害赔
 偿的其他责任。无论在本软件的使用上或其他买卖交易中， 是否涉及合同，侵权或其他行为。
+
+#Third Party Libraries/Code
+#第三方库/代码
+###The software uses the following libraries or code under their respective licenses
+###本软件在其各自的许可证下使用以下库或代码
+* [NAudio](http://naudio.codeplex.com/)([License](https://github.com/naudio/NAudio/blob/master/license.txt))
+* [Newtonsoft's Json.NET](http://www.newtonsoft.com/json)([License](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md))
+* [Perfare's *warshipgirls-png*](https://github.com/Perfare/warshipgirls-png)([License](https://github.com/Perfare/warshipgirls-png/blob/master/LICENSE))
+* [ADAM PRESCOTT's *CUSTOM SHAPED WINDOWS FORMS FROM IMAGES*](https://adamprescott.net/2012/03/02/custom-shaped-windows-forms-from-images/)
+* [Mark Heath's *Looped Playback in .NET with NAudio*](http://mark-dot-net.blogspot.com/2009/10/looped-playback-in-net-with-naudio.html)
+* [paladin_t's *A Simple PList Parser in C#*](https://www.codeproject.com/Tips/406235/A-Simple-PList-Parser-in-Csharp)([License](https://www.codeproject.com/info/cpol10.aspx))
+* [Danny Beckett's answers on Stack Overflow](http://stackoverflow.com/questions/217902/reading-writing-an-ini-file)
+* [Chris Pietschmann's *C#: Using IProgressDialog to show a “native” Progress Dialog from .NET in Windows*](http://pietschsoft.com/post/2009/08/17/CSharp-IProgressDialog-Show-Native-Progress-Dialog-from-dotNet-in-Windows)
