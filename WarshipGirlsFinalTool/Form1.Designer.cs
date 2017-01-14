@@ -38,12 +38,12 @@
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.button2 = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.Japan = new System.Windows.Forms.RadioButton();
             this.Android = new System.Windows.Forms.RadioButton();
             this.iOS = new System.Windows.Forms.RadioButton();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.exit = new System.Windows.Forms.ToolStripMenuItem();
-            this.Japan = new System.Windows.Forms.RadioButton();
             this.panel1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -122,6 +122,18 @@
             this.panel1.Size = new System.Drawing.Size(294, 86);
             this.panel1.TabIndex = 7;
             // 
+            // Japan
+            // 
+            this.Japan.AutoSize = true;
+            this.Japan.Font = new System.Drawing.Font("宋体", 11F);
+            this.Japan.Location = new System.Drawing.Point(19, 47);
+            this.Japan.Name = "Japan";
+            this.Japan.Size = new System.Drawing.Size(68, 23);
+            this.Japan.TabIndex = 2;
+            this.Japan.TabStop = true;
+            this.Japan.Text = "日服";
+            this.Japan.UseVisualStyleBackColor = true;
+            // 
             // Android
             // 
             this.Android.AutoSize = true;
@@ -160,26 +172,14 @@
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exit});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(115, 30);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(109, 28);
             // 
             // exit
             // 
             this.exit.Name = "exit";
-            this.exit.Size = new System.Drawing.Size(114, 26);
+            this.exit.Size = new System.Drawing.Size(108, 24);
             this.exit.Text = "退出";
             this.exit.Click += new System.EventHandler(this.exit_Click);
-            // 
-            // Japan
-            // 
-            this.Japan.AutoSize = true;
-            this.Japan.Font = new System.Drawing.Font("宋体", 11F);
-            this.Japan.Location = new System.Drawing.Point(19, 47);
-            this.Japan.Name = "Japan";
-            this.Japan.Size = new System.Drawing.Size(68, 23);
-            this.Japan.TabIndex = 2;
-            this.Japan.TabStop = true;
-            this.Japan.Text = "日服";
-            this.Japan.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -197,6 +197,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.contextMenuStrip1.ResumeLayout(false);

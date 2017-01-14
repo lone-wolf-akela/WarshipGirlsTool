@@ -111,6 +111,13 @@ namespace WarshipGirlsFinalTool
             DateTime dtZone = new DateTime(1970, 1, 1, 0, 0, 0);
             return (long)vDate.Subtract(dtZone).TotalMilliseconds;
         }
+        public static string toHMS(this TimeSpan time)
+        {
+            return string.Format("{0}:{1}:{2}",
+                ((int)time.TotalHours).ToString("00"),
+                time.Minutes.ToString("00"),
+                time.Seconds.ToString("00"));
+        }
     }
 
     public class Music
@@ -142,6 +149,7 @@ namespace WarshipGirlsFinalTool
                 timeRecord[isPlaying] = audioFile.Position;               
                 isPlaying = "";
                 waveOutDevice.Stop();
+                audioFile.Close();
             }           
         }
 

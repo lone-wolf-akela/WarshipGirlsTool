@@ -58,6 +58,7 @@ Bitmap^ WSGPNG::getPVRCCZ(String ^filename)
 	unzip->Read(imageBuffer, 0, pvrHeader->dataSize);
 	pin_ptr<unsigned char> pImage = &imageBuffer[0];
 
+	//From ABGR to ARGB
 	for (uint32_t *pixel = (uint32_t*)pImage;pixel - (uint32_t*)pImage < pvrHeader->dataSize / 4;pixel++)
 		*pixel = ((*pixel & 0xff00ff00) | ((*pixel & 0x000000ff) << 16) | ((*pixel & 0x00ff0000) >> 16));
 

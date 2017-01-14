@@ -23,6 +23,8 @@ namespace WarshipGirlsFinalTool
 {
     public class Warshipgirls
     {
+        public Random random = new Random();
+
         public string firstSever;
         public int market;
         public int channel;
@@ -46,8 +48,7 @@ namespace WarshipGirlsFinalTool
                 }
             }
         }
-
-        private const string device = @"Lone Wolf PC Client/0.0.4 (Windows 10) https://github.com/lone-wolf-akela/WarshipGirlsTool";
+        public string device;
 
         private XmlDocument language_xml;
 
@@ -84,7 +85,8 @@ namespace WarshipGirlsFinalTool
             var request = WebRequest.Create(uri) as HttpWebRequest;
             request.Method = @"GET";
             request.ProtocolVersion = new Version(1, 1);
-            request.UserAgent = device;
+            if(device!=null)
+                request.UserAgent = device;
             request.KeepAlive = true;
 
             var response = request.GetResponse() as HttpWebResponse;
@@ -120,7 +122,8 @@ namespace WarshipGirlsFinalTool
             var request = WebRequest.Create(uri) as HttpWebRequest;
             request.Method = @"GET";
             request.ProtocolVersion = new Version(1, 1);
-            request.UserAgent = device;
+            if (device != null)
+                request.UserAgent = device;
             request.KeepAlive = true;
             var response = request.GetResponse() as HttpWebResponse;
             Stream responsestream = response.GetResponseStream();
@@ -151,7 +154,8 @@ namespace WarshipGirlsFinalTool
             var proj_manifest_Request = WebRequest.Create(ResUrlWu) as HttpWebRequest;
             proj_manifest_Request.Method = @"GET";
             proj_manifest_Request.ProtocolVersion = new Version(1, 1);
-            proj_manifest_Request.UserAgent = device;
+            if (device != null)
+                proj_manifest_Request.UserAgent = device;
             proj_manifest_Request.KeepAlive = true;
             using (var proj_manifest_Reader =
                 new StreamReader(proj_manifest_Request.GetResponse().GetResponseStream(),
@@ -214,7 +218,8 @@ namespace WarshipGirlsFinalTool
                 var fileRequest = WebRequest.Create(file.uri) as HttpWebRequest;
                 fileRequest.Method = @"GET";
                 fileRequest.ProtocolVersion = new Version(1, 1);
-                fileRequest.UserAgent = device;
+                if (device != null)
+                    fileRequest.UserAgent = device;
                 fileRequest.KeepAlive = true;
 
                 using (var fileResponse = fileRequest.GetResponse().GetResponseStream())
@@ -243,10 +248,11 @@ namespace WarshipGirlsFinalTool
             var request = WebRequest.Create(uri) as HttpWebRequest;
             request.Method = @"POST";
             request.ProtocolVersion = new Version(1, 1);
-            request.UserAgent = device;
+            if (device != null)
+                request.UserAgent = device;
             request.KeepAlive = true;
             request.ContentType = @"application/x-www-form-urlencoded";
-            string param = @"username=" + username + @"&pwd=" + password;
+            string param = $"username={username}&pwd={password}";
             byte[] bs = Encoding.UTF8.GetBytes(param);
             using (Stream reqStream = request.GetRequestStream())
             {
@@ -267,11 +273,41 @@ namespace WarshipGirlsFinalTool
             var request = WebRequest.Create(uri) as HttpWebRequest;
             request.Method = @"GET";
             request.ProtocolVersion = new Version(1, 1);
-            request.UserAgent = device;
+            if (device != null)
+                request.UserAgent = device;
             request.KeepAlive = true;
             request.CookieContainer = new CookieContainer();
             request.CookieContainer.Add(new Uri(gameServer), new Cookie("hf_skey", hf_skey));
             request.CookieContainer.Add(new Uri(gameServer), new Cookie("path", @"/"));
+
+            var response = request.GetResponse() as HttpWebResponse;
+            Stream responsestream = response.GetResponseStream();
+            responsestream.ReadByte();
+            responsestream.ReadByte();
+            var sr = new StreamReader(new DeflateStream(responsestream, CompressionMode.Decompress));
+            return sr.ReadToEnd();
+        }
+
+        private string StdPostRequest(string command)
+        {
+            string uri = $"{gameServer}{command}&t={DateTime.Now.ToUTC()}&e={GetNewUDID()}&gz=1{uriend()}";
+            var request = WebRequest.Create(uri) as HttpWebRequest;
+            request.Method = @"POST";
+            request.ProtocolVersion = new Version(1, 1);
+            if (device != null)
+                request.UserAgent = device;
+            request.KeepAlive = true;
+            request.ContentType = @"application/x-www-form-urlencoded";
+            request.CookieContainer = new CookieContainer();
+            request.CookieContainer.Add(new Uri(gameServer), new Cookie("hf_skey", hf_skey));
+            request.CookieContainer.Add(new Uri(gameServer), new Cookie("path", @"/"));
+
+            string param = "pve_level=1";
+            byte[] bs = Encoding.UTF8.GetBytes(param);
+            using (Stream reqStream = request.GetRequestStream())
+            {
+                reqStream.Write(bs, 0, bs.Length);
+            }
 
             var response = request.GetResponse() as HttpWebResponse;
             Stream responsestream = response.GetResponseStream();
@@ -292,7 +328,7 @@ namespace WarshipGirlsFinalTool
             gameinfo = CreateJsonText(StdGetRequest(@"api/initGame/"));
         }
 
-        public JsonText explore_getResult(string expID)
+        public string explore_getResult(string expID,bool messagebox = true)
         {
             JsonText Res = CreateJsonText(StdGetRequest($"explore/getResult/{expID}/"));
             if (Res["updateTaskVo"] != null)
@@ -314,8 +350,7 @@ namespace WarshipGirlsFinalTool
             };            
             ((JObject) gameinfo["userVo"]).Merge(Res["userLevelVo"], mergeSettings);
             //((JObject)gameinfo["detailInfo"]).Merge(Res["userLevelVo"], mergeSettings);
-            JToken packageVo;
-            if (Res.obj.TryGetValue("packageVo", out packageVo))
+            if (Res.obj.TryGetValue("packageVo", out var packageVo))
             {
                 foreach (var itemnew in packageVo)
                 {
@@ -334,13 +369,70 @@ namespace WarshipGirlsFinalTool
             gameinfo["detailInfo"] = Res["detailInfo"];
             //shipVO
             gameinfo["fleetVo"] = Res["fleetVo"];
-            return Res;
+            ///////////////////////////////////////////////////////////////////
+            string expTitle = (from expinfo in init_txt["pveExplore"]
+                               where (string)expinfo["id"] == expID
+                               select (string)expinfo["title"]).First();
+
+            string resStr = string.Format(getLangStr("ExpeditionCompleted")
+                                .Replace("%d", "{0}").Replace("%s", "{1}"),
+                                Res["shipVO"]["id"], expTitle);
+
+            if ((string)Res["bigSuccess"] == "1")
+                resStr += Environment.NewLine + "大成功！";
+
+            resStr += Environment.NewLine + "获得：" + Environment.NewLine;
+            foreach (var award in (JObject)Res["newAward"])
+            {
+                resStr += "\t" + getCidText(int.Parse(award.Key)) + "x" + (string)award.Value + Environment.NewLine;
+            }
+
+            resStr += "舰队成员：" + Environment.NewLine;
+            int shipIndex = 0;
+            //int intimacyOtherIndex = 0;
+            foreach (var shipID in (JArray)Res["shipVO"]["ships"])
+            {
+                int shipCid = (from ship in gameinfo["userShipVO"] where ship["id"].ToString() == (string)shipID select (int)ship["shipCid"]).First();
+                resStr += "\t" + getCidText(shipCid) + "\t";
+                if (Res["loveChange"].HasValues &&
+                    Res["loveChange"][shipIndex].ToString().ToLower() != "false")
+                {
+                    resStr += "好感度:+" + Res["loveChange"][shipIndex] + Environment.NewLine;
+                    var shipinfo = from ship in gameinfo["userShipVO"]
+                                   where ship["id"].ToString() == (string)shipID
+                                   select ship;
+                    shipinfo.First()["love"] =
+                        (int)shipinfo.First()["love"] +
+                        (int)Res["loveChange"][shipIndex];
+                }
+                else
+                {
+                    resStr += Environment.NewLine;
+                }
+                shipIndex++;
+            }
+            if(messagebox)
+                MessageBox.Show(resStr, getLangStr("HasFinishedPVEExplore"));
+            return resStr;
         }
 
         public void explore_cancel(string expID)
         {
-            JsonText Res = CreateJsonText(StdGetRequest($"explore/cancel/{expID}/"));
-            //status?
+            if (MessageBox.Show(getLangStr("PVEBackSubtitle"),
+                            getLangStr("PVEBackToPort"),
+                            MessageBoxButtons.YesNo)
+                == DialogResult.Yes)
+            {
+                JsonText Res = CreateJsonText(StdGetRequest($"explore/cancel/{expID}/"));
+                //status?
+                gameinfo["pveExploreVo"] = Res["pveExploreVo"];
+                gameinfo["fleetVo"] = Res["fleetVo"];
+            }
+        }
+
+        public void explore_start(string expID,string fleetID)
+        {
+            JsonText Res = CreateJsonText(StdPostRequest($"explore/start/{fleetID}/{expID}/"));
             gameinfo["pveExploreVo"] = Res["pveExploreVo"];
             gameinfo["fleetVo"] = Res["fleetVo"];
         }
@@ -364,7 +456,7 @@ namespace WarshipGirlsFinalTool
             {
                 shipModel = (from ship in init_txt["shipCard"] where ship["cid"].ToString() == shipinfo["shipCid"].ToString() select ship["picId"].ToString()).First();
             }
-            if (double.Parse((string) shipinfo["battleProps"]["hp"]) < Math.Ceiling(double.Parse((string) shipinfo["battlePropsBasic"]["hp"])/2))
+            if (double.Parse((string) shipinfo["battleProps"]["hp"]) < Math.Ceiling(double.Parse((string) shipinfo["battlePropsMax"]["hp"])/2))
             {
                 shipModel = "BROKEN_" + shipModel;
             }
@@ -429,6 +521,11 @@ namespace WarshipGirlsFinalTool
 
             throw new ArgumentOutOfRangeException();
 
+        }
+
+        public string getShipTypeText(string type)
+        {
+            return getLangStr("ShipType" + type);
         }
         /////////////////////////////////////////////////////////////////////
         public readonly Music music=new Music();

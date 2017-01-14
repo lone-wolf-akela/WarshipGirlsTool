@@ -15,9 +15,7 @@ namespace WarshipGirlsFinalTool
 {
     public partial class Form3 : Form
     {
-        public Form1 form1;
-        public Form2 form2;
-        public Warshipgirls conn;
+        public Form1.SharedRes sharedRes;
 
         private PictureBox[] FleetPics = new PictureBox[4];
         private Button[] btnFleepOps = new Button[4];
@@ -45,23 +43,23 @@ namespace WarshipGirlsFinalTool
             if (DateTime.Now.TimeOfDay < new TimeSpan(6, 0, 0)
                 || DateTime.Now.TimeOfDay > new TimeSpan(18, 0, 0))
             {
-                conn.music.play("port-night.mp3", false);
+                sharedRes.conn.music.play("port-night.mp3", false);
             }
             else
             {
-                conn.music.play("port-day.mp3", false);
+                sharedRes.conn.music.play("port-day.mp3", false);
             }
         }
 
         private void Form3_Deactivate(object sender, EventArgs e)
         {
-            conn.music.stop();
+            sharedRes.conn.music.stop();
         }
 
         private void Form3_FormClosed(object sender, FormClosedEventArgs e)
         {
-            form2.form3 = null;
-            form2.Focus();
+            sharedRes.form3 = null;
+            sharedRes.form2.Focus();
         }
 
         private void Form3_Load(object sender, EventArgs e)
@@ -72,7 +70,7 @@ namespace WarshipGirlsFinalTool
 
         private void UILoad()
         {
-            imageRes["ship_boader_ing"] = conn.imageFinder.getImage("ship_boader_ing.png");
+            imageRes["ship_boader_ing"] = sharedRes.conn.imageFinder.getImage("ship_boader_ing.png");
 
             for (int i = 0; i < 4; i++)
             {
@@ -89,7 +87,7 @@ namespace WarshipGirlsFinalTool
                 using (Graphics g = Graphics.FromImage(tmpBitmap))
                 {
                     g.DrawString(String.Format("第{0}舰队", i + 1),
-                        new Font(form1.msyhbd.Families[0], 10),
+                        new Font(sharedRes.msyhbd.Families[0], 10),
                         new SolidBrush(Color.Black),
                         new RectangleF(12, 12,
                             FleetPics[i].Width - 12,
@@ -98,22 +96,21 @@ namespace WarshipGirlsFinalTool
                         );
 
                     string fleetstate;
-                    var info = from expinfo in conn.gameinfo["pveExploreVo"]["levels"]
+                    var info = from expinfo in sharedRes.conn.gameinfo["pveExploreVo"]["levels"]
                                where (string)expinfo["fleetId"] == (i + 1).ToString()
                                select expinfo;
                     if (info.Any())
                     {
-                        int time = (int)(long.Parse((string)info.First()["endTime"])
-                                          - DateTime.Now.ToUTC() / 1000);
+                        int time = (int)((long)info.First()["endTime"] - DateTime.Now.ToUTC() / 1000);
                         if (time >= 0)
                         {
-                            fleetstate = new TimeSpan(0, 0, time).ToString(@"hh\:mm\:ss");
+                            fleetstate = new TimeSpan(0, 0, time).toHMS();
                             FleetStates[i] = fleetState.exploring;
                             btnFleepOps[i].Text = "回港";
                         }
                         else
                         {
-                            fleetstate = conn.getLangStr("HasFinishedPVEExplore");
+                            fleetstate = sharedRes.conn.getLangStr("HasFinishedPVEExplore");
                             FleetStates[i] = fleetState.expfinshed;
                             btnFleepOps[i].Text = "完成";
                         }
@@ -126,7 +123,7 @@ namespace WarshipGirlsFinalTool
                     }
 
                     g.DrawString(fleetstate,
-                        new Font(form1.msyhbd.Families[0], 14),
+                        new Font(sharedRes.msyhbd.Families[0], 14),
                         new SolidBrush(Color.Black),
                         new RectangleF(0, 0,
                             FleetPics[i].Width,
@@ -150,20 +147,25 @@ namespace WarshipGirlsFinalTool
             switch (FleetStates[fleetID - 1])
             {
                 case fleetState.idle:
-                    //TODO:出征
+                    //出征
+                    if (sharedRes.form4 != null)
+                        sharedRes.form4.Close();
+                    sharedRes.form4 = new Form4
+                    {
+                        sharedRes = sharedRes,
+                        formSource = this,
+                        defaultFleet = fleetID,
+                    };
+                    sharedRes.form4.Show();
                     break;
                 case fleetState.exploring:
+                    //召回远征
                     try
                     {
-                        if (MessageBox.Show(conn.getLangStr("PVEBackSubtitle"),
-                            conn.getLangStr("PVEBackToPort"), MessageBoxButtons.YesNo)
-                            == DialogResult.Yes)
-                        {
-                            var exploreId = from expinfo in conn.gameinfo["pveExploreVo"]["levels"]
-                                            where (string)expinfo["fleetId"] == fleetID.ToString()
-                                            select (string)expinfo["exploreId"];
-                            conn.explore_cancel(exploreId.First());
-                        }
+                        var exploreId = from expinfo in sharedRes.conn.gameinfo["pveExploreVo"]["levels"]
+                                        where (string)expinfo["fleetId"] == fleetID.ToString()
+                                        select (string)expinfo["exploreId"];
+                        sharedRes.conn.explore_cancel(exploreId.First());
                     }
                     catch (Exception ex)
                     {
@@ -171,56 +173,13 @@ namespace WarshipGirlsFinalTool
                     }
                     break;
                 case fleetState.expfinshed:
+                    //完成远征
                     try
                     {
-                        string exploreId = (from expinfo in conn.gameinfo["pveExploreVo"]["levels"]
+                        string exploreId = (from expinfo in sharedRes.conn.gameinfo["pveExploreVo"]["levels"]
                                             where (string)expinfo["fleetId"] == fleetID.ToString()
                                             select (string)expinfo["exploreId"]).First();
-                        string exploreTitle = (from expinfo in conn.init_txt["pveExplore"]
-                                               where (string)expinfo["id"] == exploreId
-                                               select (string)expinfo["title"]).First();
-
-                        JsonText Res = conn.explore_getResult(exploreId);
-
-                        string resStr = string.Format(conn.getLangStr("ExpeditionCompleted")
-                                .Replace("%d", "{0}").Replace("%s", "{1}"),
-                                Res["shipVO"]["id"], exploreTitle);
-
-                        if ((string)Res["bigSuccess"] == "1")
-                            resStr += "\n大成功！";
-
-                        resStr += "\n获得：\n";
-                        foreach (var award in (JObject)Res["newAward"])
-                        {
-                            resStr += "\t" + conn.getCidText(int.Parse(award.Key)) + "x" + (string)award.Value + "\n";
-                        }
-
-                        resStr += "舰队成员：\n";
-                        int shipIndex = 0;
-                        //int intimacyOtherIndex = 0;
-                        foreach (var shipID in (JArray)Res["shipVO"]["ships"])
-                        {
-                            int shipCid = (from ship in conn.gameinfo["userShipVO"] where ship["id"].ToString() == (string)shipID select int.Parse((string)ship["shipCid"])).First();
-                            resStr += "\t" + conn.getCidText(shipCid) + "\t";
-                            if (Res["loveChange"].HasValues &&
-                                Res["loveChange"][shipIndex].ToString().ToLower() != "false")
-                            {
-                                resStr += "好感度:+" + Res["loveChange"][shipIndex] + "\n";
-                                var shipinfo = from ship in conn.gameinfo["userShipVO"]
-                                               where ship["id"].ToString() == (string)shipID
-                                               select ship;
-                                shipinfo.First()["love"] =
-                                    int.Parse((string)shipinfo.First()["love"]) +
-                                    int.Parse((string)Res["loveChange"][shipIndex]);
-                            }
-                            else
-                            {
-                                resStr += "\n";
-                            }
-                            shipIndex++;
-                        }
-
-                        MessageBox.Show(resStr, conn.getLangStr("HasFinishedPVEExplore"));
+                        sharedRes.conn.explore_getResult(exploreId);                        
                     }
                     catch (Exception ex)
                     {

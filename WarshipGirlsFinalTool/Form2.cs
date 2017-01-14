@@ -16,6 +16,9 @@ namespace WarshipGirlsFinalTool
 {
     public partial class Form2 : Form
     {
+        public Form1.SharedRes sharedRes;
+        private readonly Dictionary<string, Image> imageRes = new Dictionary<string, Image>();
+
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             if (BackgroundImage == null) base.OnPaintBackground(e);
@@ -35,11 +38,6 @@ namespace WarshipGirlsFinalTool
             main_source_frame.Location = new Point((this.Size.Width - main_source_frame.Size.Width) / 2, 0);
         }
 
-        public Warshipgirls conn;
-        public Form1 form1;
-        public Form3 form3;
-
-        private readonly Dictionary<string, Image> imageRes = new Dictionary<string, Image>();
         public Form2()
         {
             InitializeComponent();
@@ -56,16 +54,16 @@ namespace WarshipGirlsFinalTool
 
         private void UIload()
         {
-            imageRes["main_source_frame1"] = conn.imageFinder.getImage("main_source_frame1.png");
-            imageRes["main_source_frame2"] = conn.imageFinder.getImage("main_source_frame2.png");
-            imageRes["main_source_frame3"] = conn.imageFinder.getImage("main_source_frame3.png");
-            imageRes["main_source_1"] = conn.imageFinder.getImage("main_source_1.png");//弹
-            imageRes["main_source_2"] = conn.imageFinder.getImage("main_source_2.png");//钢
-            imageRes["main_source_3"] = conn.imageFinder.getImage("main_source_3.png");//铝
-            imageRes["main_source_4"] = conn.imageFinder.getImage("main_source_4.png");//油
+            imageRes["main_source_frame1"] = sharedRes.conn.imageFinder.getImage("main_source_frame1.png");
+            imageRes["main_source_frame2"] = sharedRes.conn.imageFinder.getImage("main_source_frame2.png");
+            imageRes["main_source_frame3"] = sharedRes.conn.imageFinder.getImage("main_source_frame3.png");
+            imageRes["main_source_1"] = sharedRes.conn.imageFinder.getImage("main_source_1.png");//弹
+            imageRes["main_source_2"] = sharedRes.conn.imageFinder.getImage("main_source_2.png");//钢
+            imageRes["main_source_3"] = sharedRes.conn.imageFinder.getImage("main_source_3.png");//铝
+            imageRes["main_source_4"] = sharedRes.conn.imageFinder.getImage("main_source_4.png");//油
 
-            imageRes["main_btn_sheep"] = conn.imageFinder.getImage("main_btn_sheep.png");
-            imageRes["main_btn_sheep_g"] = conn.imageFinder.getImage("main_btn_sheep_g.png");
+            imageRes["main_btn_sheep"] = sharedRes.conn.imageFinder.getImage("main_btn_sheep.png");
+            imageRes["main_btn_sheep_g"] = sharedRes.conn.imageFinder.getImage("main_btn_sheep_g.png");
 
             btnDock.BackgroundImage = imageRes["main_btn_sheep"];
             btnDock.Region = helper.GetRegionFromImg(new Bitmap(imageRes["main_btn_sheep"]));
@@ -81,9 +79,9 @@ namespace WarshipGirlsFinalTool
         }
         private void RefreshBasicData()
         {
-            textBox1.Text = (string)conn.gameinfo["userVo"]["username"];
-            textBox2.Text = (string)conn.gameinfo["userVo"]["level"];
-            textBox3.Text = (string)conn.gameinfo["userVo"]["exp"];
+            textBox1.Text = (string)sharedRes.conn.gameinfo["userVo"]["username"];
+            textBox2.Text = (string)sharedRes.conn.gameinfo["userVo"]["level"];
+            textBox3.Text = (string)sharedRes.conn.gameinfo["userVo"]["exp"];
 
             if (DateTime.Now.TimeOfDay < new TimeSpan(6, 0, 0)
                 || DateTime.Now.TimeOfDay > new TimeSpan(18, 0, 0))
@@ -95,14 +93,14 @@ namespace WarshipGirlsFinalTool
                 this.BackgroundImage = Image.FromFile(@"documents\hot\ccbResources\main_light_bg.png");
             }
 
-            string secretaryID = conn.gameinfo["secretary"].ToString();
+            string secretaryID = sharedRes.conn.gameinfo["secretary"].ToString();
             if (secretaryID == "0")
             {
-                secretaryID = (from fleet in conn.gameinfo["fleetVo"]
+                secretaryID = (from fleet in sharedRes.conn.gameinfo["fleetVo"]
                                where fleet["id"].ToString() == "1"
                                select fleet["ships"][0].ToString()).First();
             }
-            shipPic.Image = conn.getShipImage(secretaryID,
+            shipPic.Image = sharedRes.conn.getShipImage(secretaryID,
                 Warshipgirls.ShipImageType.L, false);
         }
 
@@ -122,8 +120,8 @@ namespace WarshipGirlsFinalTool
                 //油
                 g.DrawImage(imageRes["main_source_frame1"], 0, 0);
                 g.DrawImage(imageRes["main_source_4"], 0, 0);
-                g.DrawString((string)conn.gameinfo["userVo"]["oil"],
-                    new Font(form1.DejaVuSansMono.Families[0], 10),
+                g.DrawString((string)sharedRes.conn.gameinfo["userVo"]["oil"],
+                    new Font(sharedRes.DejaVuSansMono.Families[0], 10),
                     new SolidBrush(Color.White),
                     new RectangleF(imageRes["main_source_4"].Width, 0,
                         imageRes["main_source_frame1"].Width - imageRes["main_source_4"].Width,
@@ -133,8 +131,8 @@ namespace WarshipGirlsFinalTool
                 //弹
                 g.DrawImage(imageRes["main_source_frame2"], imageRes["main_source_frame1"].Width, 0);
                 g.DrawImage(imageRes["main_source_1"], imageRes["main_source_frame1"].Width, 0);
-                g.DrawString((string)conn.gameinfo["userVo"]["ammo"],
-                    new Font(form1.DejaVuSansMono.Families[0], 10),
+                g.DrawString((string)sharedRes.conn.gameinfo["userVo"]["ammo"],
+                    new Font(sharedRes.DejaVuSansMono.Families[0], 10),
                     new SolidBrush(Color.White),
                     new RectangleF(imageRes["main_source_frame1"].Width + imageRes["main_source_1"].Width, 0,
                         imageRes["main_source_frame2"].Width - imageRes["main_source_1"].Width,
@@ -146,8 +144,8 @@ namespace WarshipGirlsFinalTool
                     imageRes["main_source_frame1"].Width + imageRes["main_source_frame2"].Width, 0);
                 g.DrawImage(imageRes["main_source_2"],
                     imageRes["main_source_frame1"].Width + imageRes["main_source_frame2"].Width, 0);
-                g.DrawString((string)conn.gameinfo["userVo"]["steel"],
-                    new Font(form1.DejaVuSansMono.Families[0], 10),
+                g.DrawString((string)sharedRes.conn.gameinfo["userVo"]["steel"],
+                    new Font(sharedRes.DejaVuSansMono.Families[0], 10),
                     new SolidBrush(Color.White),
                     new RectangleF(imageRes["main_source_frame1"].Width + imageRes["main_source_frame2"].Width
                     + imageRes["main_source_2"].Width, 0,
@@ -160,8 +158,8 @@ namespace WarshipGirlsFinalTool
                     imageRes["main_source_frame1"].Width + imageRes["main_source_frame2"].Width * 2, 0);
                 g.DrawImage(imageRes["main_source_3"],
                     imageRes["main_source_frame1"].Width + imageRes["main_source_frame2"].Width * 2, 0);
-                g.DrawString((string)conn.gameinfo["userVo"]["aluminium"],
-                    new Font(form1.DejaVuSansMono.Families[0], 10),
+                g.DrawString((string)sharedRes.conn.gameinfo["userVo"]["aluminium"],
+                    new Font(sharedRes.DejaVuSansMono.Families[0], 10),
                     new SolidBrush(Color.White),
                     new RectangleF(imageRes["main_source_frame1"].Width + imageRes["main_source_frame2"].Width * 2
                     + imageRes["main_source_3"].Width, 0,
@@ -178,7 +176,7 @@ namespace WarshipGirlsFinalTool
             foreach (Control ctrl in parent.Controls)
             {
                 if (ctrl is Label)
-                    ((Label)ctrl).Text = conn.getLangStr(((Label)ctrl).Text);
+                    ((Label)ctrl).Text = sharedRes.conn.getLangStr(((Label)ctrl).Text);
                 else
                     setLanguage(ctrl);
             }
@@ -186,16 +184,18 @@ namespace WarshipGirlsFinalTool
 
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)
         {
-            form1.ingame = false;
-            form1.Show();
+            sharedRes.ingame = false;
+            sharedRes.form1.Show();
         }
 
         private void Form2_Resize(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Minimized)
             {
-                form3?.Close();
-                form3 = null;
+                sharedRes.form3?.Close();
+                sharedRes.form3 = null;
+                sharedRes.form4?.Close();
+                sharedRes.form4 = null;
                 this.Hide();
             }
         }
@@ -213,7 +213,7 @@ namespace WarshipGirlsFinalTool
         {
             for (int fleetId = 1; fleetId <= 4; fleetId++)
             {
-                var info = from expinfo in conn.gameinfo["pveExploreVo"]["levels"]
+                var info = from expinfo in sharedRes.conn.gameinfo["pveExploreVo"]["levels"]
                            where (string)expinfo["fleetId"] == fleetId.ToString()
                            select expinfo;
                 if (!info.Any())
@@ -222,12 +222,11 @@ namespace WarshipGirlsFinalTool
                 }
                 else
                 {
-                    string exploreTitle = (from expinfo in conn.init_txt["pveExplore"]
+                    string exploreTitle = (from expinfo in sharedRes.conn.init_txt["pveExplore"]
                                        where (string)expinfo["id"] == (string)info.First()["exploreId"]
                                        select (string)expinfo["title"]).First();
 
-                    int time = (int)(long.Parse((string)info.First()["endTime"])
-                        - DateTime.Now.ToUTC() / 1000);
+                    int time = (int)((long)info.First()["endTime"] - DateTime.Now.ToUTC() / 1000);
                     if (time >= 0)
                     {
                         explorestate[fleetId] = ExploreState.exploring;
@@ -235,8 +234,8 @@ namespace WarshipGirlsFinalTool
                     else
                     {
                         if (explorestate[fleetId] != ExploreState.finshed)
-                            form1.notice(2000, conn.getLangStr("HasFinishedPVEExplore"),
-                                string.Format(conn.getLangStr("ExpeditionCompleted")
+                            sharedRes.form1.notice(2000, sharedRes.conn.getLangStr("HasFinishedPVEExplore"),
+                                string.Format(sharedRes.conn.getLangStr("ExpeditionCompleted")
                                 .Replace("%d", "{0}").Replace("%s", "{1}"), fleetId, exploreTitle),
                                 ToolTipIcon.Info);
                         explorestate[fleetId] = ExploreState.finshed;
@@ -250,25 +249,25 @@ namespace WarshipGirlsFinalTool
             if (DateTime.Now.TimeOfDay < new TimeSpan(6, 0, 0)
                 || DateTime.Now.TimeOfDay > new TimeSpan(18, 0, 0))
             {
-                conn.music.play("port-night.mp3", false);
+                sharedRes.conn.music.play("port-night.mp3", false);
             }
             else
             {
-                conn.music.play("port-day.mp3", false);
+                sharedRes.conn.music.play("port-day.mp3", false);
             }
         }
 
         private void Form2_Deactivate(object sender, EventArgs e)
         {
-            conn.music.stop();
+            sharedRes.conn.music.stop();
         }
 
         private void btnDock_Click(object sender, EventArgs e)
         {
-            if (form3 == null)
-                form3 = new Form3 { conn = conn, form1 = form1, form2 = this };
-            form3.Show();
-            form3.Focus();
+            if (sharedRes.form3 == null)
+                sharedRes.form3 = new Form3 { sharedRes = sharedRes };
+            sharedRes.form3.Show();
+            sharedRes.form3.Focus();
         }
     }
 }
