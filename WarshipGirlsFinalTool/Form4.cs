@@ -169,6 +169,7 @@ namespace WarshipGirlsFinalTool
                             //船只数量是否足够？
                             else if(fleetInfo["ships"].Count()< (int)expInfo["needShipNum"])
                                 form5.fleetAvailable[i] = false;
+                            //TODO:旗舰等级是否足够？
                             //船只类型是否满足？
                             else
                             {                                

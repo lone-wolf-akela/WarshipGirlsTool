@@ -87,9 +87,9 @@ namespace WarshipGirlsFinalTool
                     throw new Exception("Please Choose a Server!");
                 }
                 sharedRes.conn.Language = Warshipgirls.LANG.SChinese;
-                sharedRes.conn.checkVer();
-                sharedRes.conn.getInitConfigs();
+                sharedRes.conn.checkVer();                
                 sharedRes.conn.downloadRes(this);
+                sharedRes.conn.getInitConfigs();
                 sharedRes.conn.passportLogin();
                 listBox1.Items.Clear();
                 foreach (var server in sharedRes.conn.passportLogin_txt["serverList"])

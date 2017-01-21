@@ -14,6 +14,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Data;
 using NAudio.Wave;
+using NLua;
 using WarshipGirlsPNGTool;
 
 namespace WarshipGirlsFinalTool
@@ -278,6 +279,21 @@ namespace WarshipGirlsFinalTool
             }
 
             throw new Exception("Can't Find Picture: " + file);
+        }
+    }
+
+    public class MOD
+    {
+        Lua luastate = new Lua();
+        public MOD()
+        {
+
+        }
+
+        string path(string file)
+        {
+
+            return file;
         }
     }
 }
