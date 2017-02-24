@@ -1,4 +1,6 @@
 # WarshipGirlsTool
+ [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/y520hh1qggv42tgf?svg=true)](https://ci.appveyor.com/project/zer0n/caffe)
+
 A small tool for the game WarshipGirlsR.
 My ultimate goal is to write a fully functional PC client for the game. But there's still a long way to go.
 
