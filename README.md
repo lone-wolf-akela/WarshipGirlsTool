@@ -1,4 +1,6 @@
 # WarshipGirlsTool
+ [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/y520hh1qggv42tgf?svg=true)](https://ci.appveyor.com/project/lone-wolf-akela/warshipgirlstool)
+
 A small tool for the game WarshipGirlsR.
 My ultimate goal is to write a fully functional PC client for the game. But there's still a long way to go.
 
@@ -11,3 +13,6 @@ My ultimate goal is to write a fully functional PC client for the game. But ther
     * BGM播放；
     * 收远征；
     * 召回远征中的舰队。
+
+##注意
+编译生成的文件中的"mod\imageReplaceFunc.lua"中包括使用waifu2x得到高清立绘进行替换的代码。请根据自己的情况修改"key"和"waifu2x_mode"变量以进行相应的控制。
