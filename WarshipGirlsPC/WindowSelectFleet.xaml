@@ -1,0 +1,26 @@
+﻿<Window x:Class="WarshipGirlsPC.WindowSelectFleet"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WarshipGirlsPC"
+        mc:Ignorable="d"
+        Title="选择舰队" Height="320.606" Width="468.43" Icon="WarshipGirls.ico" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+    <Window.Background>
+        <ImageBrush ImageSource="UnderConstructiom.png" Stretch="Uniform" TileMode="Tile"/>
+    </Window.Background>
+    <Grid Margin="0">
+        <Grid>
+            <UniformGrid Height="47.27" Margin="37.756,0,38.608,56.142" VerticalAlignment="Bottom" Columns="4">
+                <Button x:Name="btnFleet1" Content="第一舰队" Margin="5" Tag="1" Click="btnFleet_Click" Background="#E5FFFFFF"/>
+                <Button x:Name="btnFleet2" Content="第二舰队" Margin="5" Tag="2" Click="btnFleet_Click" Background="#E5FFFFFF"/>
+                <Button x:Name="btnFleet3" Content="第三舰队" Margin="5" Tag="3" Click="btnFleet_Click" Background="#E5FFFFFF"/>
+                <Button x:Name="btnFleet4" Content="第四舰队" Margin="5" Tag="4" Click="btnFleet_Click" Background="#E5FFFFFF"/>
+            </UniformGrid>
+            <TextBox x:Name="txtInfo" Margin="46.587,24.667,44.718,108.412" TextWrapping="Wrap" Text="TextBox" Background="#B2FFFFFF" IsReadOnly="True"/>
+            <Button x:Name="btnCancel" Content="取消" HorizontalAlignment="Right" Margin="0,0,44.718,10" VerticalAlignment="Bottom" Width="75" Height="32.992" Background="#E5FFFFFF" IsCancel="True" Click="btnCancel_Click"/>
+            <Button x:Name="btnOK" Content="确定" HorizontalAlignment="Right" Margin="0,0,154.318,10" VerticalAlignment="Bottom" Width="75" Height="32.992" Background="#E5FFFFFF" Click="btnOK_Click"/>
+
+        </Grid>
+    </Grid>
+</Window>
