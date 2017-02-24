@@ -304,7 +304,8 @@ namespace WarshipGirlsFinalTool
                 }
                 downloadedSize += file.size;
             }
-  
+
+            imageFinder.reset();
         }
 
         public void passportLogin()
