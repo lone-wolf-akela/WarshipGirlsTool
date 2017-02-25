@@ -16,3 +16,4 @@ My ultimate goal is to write a fully functional PC client for the game. But ther
 
 ##注意
 编译生成的文件中的"mod\imageReplaceFunc.lua"中包括使用waifu2x得到高清立绘进行替换的代码。请根据自己的情况修改"key"和"waifu2x_mode"变量以进行相应的控制。
+"mod\musicReplaceFunc.lua"中则包含替换音乐所用的代码，同样可根据自己的情况进行修改。
