@@ -199,7 +199,6 @@ namespace WarshipGirlsFinalTool
 
         public void play(string music, bool fromBegin)
         {
-
             if (isPlaying != music)
             {
                 if(isPlaying!="")
