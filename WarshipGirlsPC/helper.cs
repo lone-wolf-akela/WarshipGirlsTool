@@ -184,12 +184,19 @@ namespace WarshipGirlsFinalTool
                 waveOutDevice?.Dispose();
                 audioFile?.End();
                 audioFile?.Close();
+                luastate?.Dispose();
             }
             //让类型知道自己已经被释放
             disposed = true;
         }
 
         /********************************/
+        public Music()
+        {
+            luastate.LoadCLRPackage();
+            luastate.DoFile(@"mod\musicReplaceFunc.lua");
+        }
+
         public void play(string music, bool fromBegin)
         {
             if (isPlaying != music)
@@ -198,7 +205,10 @@ namespace WarshipGirlsFinalTool
                     stop();
                 isPlaying = music;
 
-                audioFile = new LoopStream(new AudioFileReader(@"documents\hot\audio\" + music));
+                var imageReplace = luastate["musicReplace"] as LuaFunction;
+                var res = (string)imageReplace?.Call(music.ToLower())?.First();
+
+                audioFile = new LoopStream(new AudioFileReader(res ?? @"documents\hot\audio\" + music));
                 if (!fromBegin && timeRecord.ContainsKey(music))
                     audioFile.Position = timeRecord[music];
                 waveOutDevice =new WaveOut();
@@ -232,6 +242,8 @@ namespace WarshipGirlsFinalTool
         private IWavePlayer waveOutDevice;
         private LoopStream audioFile;
 
+        private readonly Lua luastate = new Lua();
+
         /// <summary>
         /// Stream for looping playback
         /// From http://mark-dot-net.blogspot.com/2009/10/looped-playback-in-net-with-naudio.html
@@ -243,9 +255,6 @@ namespace WarshipGirlsFinalTool
                 sourceStream?.Close();
             }
            /****************/
-
-
-
             private readonly WaveStream sourceStream;
             /// <summary>
             /// Creates a new Loop stream
