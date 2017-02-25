@@ -1,4 +1,4 @@
-key = "ON" --总开关 
+key = "ON" --总开关
 --key = "OFF"
 
 waifu2x_mode = "cudnn" --waifu2x显卡加速模式

@@ -43,7 +43,8 @@
 #*.jpg   binary
 #*.png   binary
 #*.gif   binary
-*.lua
+
+*.lua   binary
 
 ###############################################################################
 # diff behavior for common document formats

@@ -1,4 +1,4 @@
-key = "ON" --总开关 
+key = "ON" --总开关
 --key = "OFF"
 
 musicList = 
