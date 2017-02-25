@@ -1,7 +1,7 @@
 key = "ON" --×Ü¿ª¹Ø
 --key = "OFF"
 
-musicList =
+musicList = 
 {
 	["move.mp3"] =
 	{

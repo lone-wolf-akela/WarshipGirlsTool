@@ -1,7 +1,7 @@
 key = "ON" --总开关
 --key = "OFF"
 
-waifu2x_mode = "cudnn"
+waifu2x_mode = "cudnn" --waifu2x显卡加速模式
 --waifu2x_mode = "gpu"
 --waifu2x_mode = "cpu"
 
