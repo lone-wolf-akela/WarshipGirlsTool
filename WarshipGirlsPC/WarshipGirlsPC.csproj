@@ -157,13 +157,13 @@
     <Resource Include="WarshipGirls.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Login.png" />
+    <Resource Include="Resources\Login.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="login_frame.png" />
+    <Resource Include="Resources\login_frame.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="login_gray_back.png" />
+    <Resource Include="Resources\login_gray_back.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WarshipGirlsPNGTool\WarshipGirlsPNGTool.vcxproj">
@@ -172,51 +172,51 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="login_server_bar2.png" />
+    <Resource Include="Resources\login_server_bar2.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="login_btn_enter_normal.png" />
+    <Resource Include="Resources\login_btn_enter_normal.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="login_btn_enter_click.png" />
+    <Resource Include="Resources\login_btn_enter_click.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="main_eve_bg.png" />
+    <Resource Include="Resources\main_eve_bg.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="L_NORMAL_1.png" />
+    <Resource Include="Resources\L_NORMAL_1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="main_btn_sheep.png" />
+    <Resource Include="Resources\main_btn_sheep.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="main_btn_sheep_g.png" />
+    <Resource Include="Resources\main_btn_sheep_g.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="main_btn_gaizao.png" />
-    <Resource Include="main_btn_gaizao_g.png" />
-    <Resource Include="main_btn_out.png" />
-    <Resource Include="main_btn_out_g.png" />
+    <Resource Include="Resources\main_btn_gaizao.png" />
+    <Resource Include="Resources\main_btn_gaizao_g.png" />
+    <Resource Include="Resources\main_btn_out.png" />
+    <Resource Include="Resources\main_btn_out_g.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="main_btn_construction.png" />
-    <Resource Include="main_btn_construction_g.png" />
+    <Resource Include="Resources\main_btn_construction.png" />
+    <Resource Include="Resources\main_btn_construction_g.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="main_source_frame.png" />
+    <Resource Include="Resources\main_source_frame.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="main_source_diam.png" />
+    <Resource Include="Resources\main_source_diam.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="main_leftupon_frame.png" />
-    <Resource Include="main_progress.png" />
+    <Resource Include="Resources\main_leftupon_frame.png" />
+    <Resource Include="Resources\main_progress.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UnderConstructiom.png" />
+    <Resource Include="Resources\UnderConstructiom.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="main_pop.PNG" />
+    <Resource Include="Resources\main_pop.PNG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

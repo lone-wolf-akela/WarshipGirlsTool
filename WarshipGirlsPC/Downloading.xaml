@@ -5,9 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WarshipGirlsPC"
         mc:Ignorable="d"
-        Title="下载中..." Height="265.909" Width="559.849" Icon="WarshipGirls.ico" WindowStartupLocation="CenterScreen">
+        Title="下载中..." Height="274.309" Width="497.849" Icon="WarshipGirls.ico" WindowStartupLocation="CenterScreen">
     <Grid>
-        <Label Content="正在下载游戏数据，请稍后……" HorizontalAlignment="Left" Margin="28.995,79.469,0,0" VerticalAlignment="Top" FontSize="36"/>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="43*"/>
+            <RowDefinition Height="31*"/>
+            <RowDefinition Height="63*"/>
+            <RowDefinition Height="37*"/>
+            <RowDefinition Height="70*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30*"/>
+            <ColumnDefinition Width="217*"/>
+            <ColumnDefinition Width="30*"/>
+        </Grid.ColumnDefinitions>
+        <ProgressBar x:Name="progress" Grid.Column="1" Grid.Row="3"/>
+        <TextBlock x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Grid.Row="3"/>
+        <DockPanel LastChildFill="True" Grid.Row="1" Grid.Column="1">
+            <Label x:Name="lbEvent" HorizontalAlignment="Left" Width="169.568" Content="正在校验文件：" FontSize="16" VerticalContentAlignment="Center" DockPanel.Dock="Left"/>
+            <Label x:Name="lbFilename" Content="..." FontSize="15" Width="213.67" VerticalContentAlignment="Center" DockPanel.Dock="Left"/>
+        </DockPanel>
     </Grid>
 </Window>

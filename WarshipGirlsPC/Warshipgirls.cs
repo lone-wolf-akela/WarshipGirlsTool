@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.OleDb;
 using System.Diagnostics;
 using System.Drawing;
@@ -18,6 +19,7 @@ using Newtonsoft.Json.Linq;
 
 using static WarshipGirlsFinalTool.helper;
 using System.Windows;
+using System.Windows.Forms.VisualStyles;
 
 namespace WarshipGirlsFinalTool
 {
@@ -99,8 +101,6 @@ namespace WarshipGirlsFinalTool
                 }
             }
         }
-        public string device;
-
         private XmlDocument language_xml;
 
         private JsonText version_txt;
@@ -113,8 +113,10 @@ namespace WarshipGirlsFinalTool
         private string hf_skey;
         private string loginServer;
         private string gameServer;
-        private string ResUrlWu;
+        public string ResUrlWu;
         private string packageUrl;
+
+        private readonly WebClientEx client = new WebClientEx();
 
         public readonly Music music = new Music();
         public readonly ImageFinder imageFinder = new ImageFinder();
@@ -128,32 +130,17 @@ namespace WarshipGirlsFinalTool
         {
             var result = new JsonText(text);
             if (result["eid"] == null) return result;
-            if (init_txt != null && (string) init_txt["errorCode"][(string) result["eid"]] != null)
-                throw new Exception((string) init_txt["errorCode"][(string) result["eid"]]);
+            if (init_txt != null && (string)init_txt["errorCode"][(string)result["eid"]] != null)
+                throw new Exception((string)init_txt["errorCode"][(string)result["eid"]]);
             else
                 throw new Exception("eid:" + result["eid"]);
         }
 
         public void checkVer()
         {
-            string uri = $"{firstSever}index/checkVer/{version}/{market}/{channel}{uriend()}";
-            var request = WebRequest.Create(uri) as HttpWebRequest;
-            request.Method = @"GET";
-            request.ProtocolVersion = new Version(1, 1);
-            if(device!=null)
-                request.UserAgent = device;
-            request.KeepAlive = true;
+            client.BaseAddress = firstSever;
+            version_txt = CreateJsonText(client.DownloadString($"index/checkVer/{version}/{market}/{channel}{uriend()}"));
 
-            using (var response = request.GetResponse() as HttpWebResponse)
-            {
-                using (Stream stream = response.GetResponseStream())
-                {
-                    using (var reader = new StreamReader(stream, Encoding.UTF8))
-                    {
-                        version_txt = CreateJsonText(reader.ReadToEnd());
-                    }
-                }
-            }
             loginServer = (string)version_txt["loginServer"];
             if (version_txt["ResUrlWu"] != null)
             {
@@ -169,53 +156,27 @@ namespace WarshipGirlsFinalTool
         {
             if (File.Exists(@"documents\init.txt"))
             {
-                using (var sr = new StreamReader(@"documents\init.txt", Encoding.UTF8))
-                {
-                    init_txt = CreateJsonText(sr.ReadToEnd());
-                }
-                if ((string) init_txt["DataVersion"] == (string) version_txt["DataVersion"])
+                init_txt = CreateJsonText(File.ReadAllText("documents/init.txt"));
+                if ((string)init_txt["DataVersion"] == (string)version_txt["DataVersion"])
                 {
                     return;
                 }
             }
-            string uri =
-                $"{loginServer}index/getInitConfigs/&t={DateTime.Now.ToUTC()}&e={helper.GetNewUDID()}&gz=1{uriend()}";
-            var request = WebRequest.Create(uri) as HttpWebRequest;
-            request.Method = @"GET";
-            request.ProtocolVersion = new Version(1, 1);
-            if (device != null)
-                request.UserAgent = device;
-            request.KeepAlive = true;
-            using (var response = request.GetResponse() as HttpWebResponse)
-            {
-                using (Stream responsestream = response.GetResponseStream())
-                {
-                    responsestream.ReadByte();
-                    responsestream.ReadByte();
-                    using (var dzipStream = new DeflateStream(responsestream, CompressionMode.Decompress))
-                    {
-                        using (var sr2 = new StreamReader(dzipStream))
-                        {
-                            init_txt = CreateJsonText(sr2.ReadToEnd());
-                        }
-                    }
-                }
-            }
-            using (var sw = new StreamWriter(@"documents\init.txt", false, Encoding.UTF8))
-            {
-                sw.Write(init_txt.text);
-            }
+
+            client.BaseAddress = loginServer;
+            init_txt = CreateJsonText(
+                client.DownloadData(
+                    $"index/getInitConfigs/&t={DateTime.Now.ToUTC()}&e={helper.GetNewUDID()}&gz=1{uriend()}"
+                ).decompressData()
+            );
+            File.WriteAllText("documents/init.txt", init_txt.text);
         }
 
         public bool checkDownload()
         {
             if (File.Exists(@"documents\proj.manifest"))
             {
-                using (var proj_manifest_Reader =
-                    new StreamReader(@"documents\proj.manifest", Encoding.UTF8))
-                {
-                    proj_manifest = CreateJsonText(proj_manifest_Reader.ReadToEnd());
-                }
+                proj_manifest = CreateJsonText(File.ReadAllText("documents/proj.manifest"));
                 packageUrl = (string)proj_manifest["packageUrl"];
                 if ((string)proj_manifest["version"] == (string)version_txt["ResVersion"])
                 {
@@ -225,190 +186,156 @@ namespace WarshipGirlsFinalTool
             return true;
         }
 
-        public void downloadRes()
+        private class DownloadFileTask
         {
-            var proj_manifest_Request = WebRequest.Create(ResUrlWu) as HttpWebRequest;
-            proj_manifest_Request.Method = @"GET";
-            proj_manifest_Request.ProtocolVersion = new Version(1, 1);
-            if (device != null)
-                proj_manifest_Request.UserAgent = device;
-            proj_manifest_Request.KeepAlive = true;
+            public string uri;
+            public string name;
+            public long size;
+            public string md5;
 
-            using (var response = proj_manifest_Request.GetResponse().GetResponseStream())
+            public string filename => $"documents/hot/{name}";
+        }
+
+        public enum ResDownloadStage { Checking, Downloading }
+
+        public delegate void DownloadProcessDelegate(ResDownloadStage stage, string filename, long current, long max);
+        public void downloadRes(DownloadProcessDelegate callback)
+        {
+            try
             {
-                using (var proj_manifest_Reader = new StreamReader(response, Encoding.UTF8))
+                JsonText old_proj_manifest = proj_manifest;
+                client.BaseAddress = "";
+                client.DownloadString(ResUrlWu);
+                proj_manifest = CreateJsonText(client.DownloadString(ResUrlWu));
+                //proj_manifest = CreateJsonText(proj_manifest.text);
+                packageUrl = (string)proj_manifest["packageUrl"];
+                File.WriteAllText("documents/proj.manifest", proj_manifest.text);
+
+                //接下来比较检查每个需要下载的文件
+                var filefilter = new string[]
                 {
-                    proj_manifest = CreateJsonText(proj_manifest_Reader.ReadToEnd());
-                }
-            }
-            packageUrl = (string) proj_manifest["packageUrl"];
-            using (var proj_manifest_Writer =
-                new StreamWriter(@"documents\proj.manifest", false, Encoding.UTF8))
-            {
-                proj_manifest_Writer.Write(proj_manifest.text);
-            }
 
-            //接下来比较检查每个需要下载的文件
-            var filefilter = new string[]
-            {
-                
-            };
-            var toDownload = from file2chk in proj_manifest["hot"]
-                             where !(from file in filefilter where file2chk["name"].ToString().ToLower().StartsWith(file.ToLower()) select file).Any()
-                             where !File.Exists(@"documents\hot\" + file2chk["name"])
-                             || file2chk["size"].ToString() != GetFileLength(@"documents\hot\" + file2chk["name"]).ToString()
-                             || file2chk["md5"].ToString() != GetMD5FromFile(@"documents\hot\" + file2chk["name"])
-                             select new
-                             {
-                                 uri = packageUrl + file2chk["name"] + @"?md5=" + file2chk["md5"],
-                                 filename = @"documents\hot\" + file2chk["name"],
-                                 size = long.Parse((string)file2chk["size"])
-                             };
+                };
 
-            long totalSize = toDownload.Sum(f => f.size);
-
-            //准备进度条对话框
-            
-            //开始下载
-            //此处无法使用多线程并行下载：辣鸡幼明会强制断开连接
-            long downloadedSize = 0;
-            foreach (var file in toDownload)
-            {
-               
-
-                Directory.CreateDirectory(Path.GetDirectoryName(file.filename));
-
-                var fileRequest = WebRequest.Create(file.uri) as HttpWebRequest;
-                fileRequest.Method = @"GET";
-                fileRequest.ProtocolVersion = new Version(1, 1);
-                if (device != null)
-                    fileRequest.UserAgent = device;
-                fileRequest.KeepAlive = true;
-
-                using (var fileResponse = fileRequest.GetResponse())
+                Dictionary<string, DownloadFileTask> oldlist;
+                if (old_proj_manifest != null)
                 {
-                    using (var fileStream = fileResponse.GetResponseStream())
-                    {
-                        using (var fileWriter =
-                            new FileStream(file.filename, FileMode.Create, FileAccess.Write))
+                    oldlist = old_proj_manifest["hot"].ToDictionary(
+                        file => (string)file["name"],
+                        file => new DownloadFileTask
                         {
-                            var buffer = new byte[1024];
-                            int size = fileStream.Read(buffer, 0, buffer.Length);
-                            while (size > 0)
+                            uri = $"{file["name"]}?md5={file["md5"]}",
+                            name = (string)file["name"],
+                            size = (long)file["size"],
+                            md5 = (string)file["md5"]
+                        }
+                    );
+                }
+                else
+                {
+                    oldlist = new Dictionary<string, DownloadFileTask>();
+                }
+
+                long current = 0;
+                long filenum = proj_manifest["hot"].Count();
+
+                var toDownload = new List<DownloadFileTask>();
+                foreach (var file2chk in proj_manifest["hot"])
+                {
+                    callback(ResDownloadStage.Checking, (string)file2chk["name"], ++current, filenum);
+
+                    if (!(//不在过滤列表中
+                            from file in filefilter
+                            where file2chk["name"].ToString().ToLower().StartsWith(file.ToLower())
+                            select file
+                        ).Any()
+                    )
+                    {
+                        if ( //文件不存在
+                            (!File.Exists($"documents/hot/{file2chk["name"]}")) ||
+                            //文件存在，但新旧文件列表中可看到文件信息并不一致
+                            (
+                                oldlist.ContainsKey((string)file2chk["name"]) &&
+                                (string)file2chk["md5"] != oldlist[(string)file2chk["name"]].md5
+                            ) ||
+                            //文件存在，但旧文件列表中没有该文件，验证该文件信息发现并不相符
+                            (
+                                !oldlist.ContainsKey((string)file2chk["name"]) &&
+                                (
+                                    (long)file2chk["size"] != GetFileLength($"documents/hot/{file2chk["name"]}") ||
+                                    (string)file2chk["md5"] != GetMD5FromFile($"documents/hot/{file2chk["name"]}")
+                                )
+                            )
+                        )
+                        {
+                            toDownload.Add(new DownloadFileTask
                             {
-                                fileWriter.Write(buffer, 0, size);
-                                size = fileStream.Read(buffer, 0, buffer.Length);
-                            }
+                                uri = $"{file2chk["name"]}?md5={file2chk["md5"]}",
+                                name = (string)file2chk["name"],
+                                size = (long)file2chk["size"],
+                                md5 = (string)file2chk["md5"]
+                            });
                         }
                     }
                 }
-                downloadedSize += file.size;
-            }
 
-            imageFinder.reset();
+                long totalSize = toDownload.Sum(f => f.size);
+                //开始下载
+                //此处无法使用多线程并行下载：辣鸡幼明会强制断开连接
+                long downloadedSize = 0;
+
+                client.BaseAddress = packageUrl;
+                foreach (var file in toDownload)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(file.filename));
+                    client.DownloadFile(file.uri, file.filename);
+                    downloadedSize += file.size;
+
+                    callback(ResDownloadStage.Downloading, file.name, downloadedSize, totalSize);
+                }
+
+                imageFinder.reset();
+            }
+            catch (Exception e)
+            {
+                Debug.Fail(e.Message);
+            }
         }
 
         public void passportLogin()
         {
-            string uri =
-                $"{loginServer}index/passportLogin/&t={DateTime.Now.ToUTC()}&e={helper.GetNewUDID()}&gz=1{uriend()}";
-            var request = WebRequest.Create(uri) as HttpWebRequest;
-            request.Method = @"POST";
-            request.ProtocolVersion = new Version(1, 1);
-            if (device != null)
-                request.UserAgent = device;
-            request.KeepAlive = true;
-            request.ContentType = @"application/x-www-form-urlencoded";
-            string param = $"username={username}&pwd={password}";
-            byte[] bs = Encoding.UTF8.GetBytes(param);
-            using (Stream reqStream = request.GetRequestStream())
-            {
-                reqStream.Write(bs, 0, bs.Length);
-            }
-            using (var response = request.GetResponse() as HttpWebResponse)
-            {
-                using (Stream responsestream = response.GetResponseStream())
-                {
-                    responsestream.ReadByte();
-                    responsestream.ReadByte();
-                    using (var dzip = new DeflateStream(responsestream, CompressionMode.Decompress))
+            client.BaseAddress = loginServer;
+            passportLogin_txt = CreateJsonText(
+                client.UploadValues(
+                    $"index/passportLogin/&t={DateTime.Now.ToUTC()}&e={GetNewUDID()}&gz=1{uriend()}",
+                    new NameValueCollection
                     {
-                        using (var sr = new StreamReader(dzip))
-                        {
-                            passportLogin_txt = CreateJsonText(sr.ReadToEnd());
-                        }
-                    }                   
-                }
-            }
-            hf_skey = (string) passportLogin_txt["hf_skey"];
+                        {"username", username},
+                        {"pwd", password}
+                    }
+                ).decompressData()
+            );
+            hf_skey = (string)passportLogin_txt["hf_skey"];
         }
 
         private string StdGetRequest(string command)
         {
-            string uri = $"{gameServer}{command}&t={DateTime.Now.ToUTC()}&e={GetNewUDID()}&gz=1{uriend()}";
-            var request = WebRequest.Create(uri) as HttpWebRequest;
-            request.Method = @"GET";
-            request.ProtocolVersion = new Version(1, 1);
-            if (device != null)
-                request.UserAgent = device;
-            request.KeepAlive = true;
-            request.CookieContainer = new CookieContainer();
-            request.CookieContainer.Add(new Uri(gameServer), new Cookie("hf_skey", hf_skey));
-            request.CookieContainer.Add(new Uri(gameServer), new Cookie("path", @"/"));
-
-            using (var response = request.GetResponse() as HttpWebResponse)
-            {
-                using (Stream responsestream = response.GetResponseStream())
-                {
-                    responsestream.ReadByte();
-                    responsestream.ReadByte();
-                    using (var dzip = new DeflateStream(responsestream, CompressionMode.Decompress))
-                    {
-                        using (var sr = new StreamReader(dzip))
-                        {
-                            return sr.ReadToEnd();
-                        }
-                    }
-                }
-            }
+            client.BaseAddress = gameServer;
+            return client.DownloadData(
+                $"{command}&t={DateTime.Now.ToUTC()}&e={GetNewUDID()}&gz=1{uriend()}"
+            ).decompressData();
         }
 
         private string StdPostRequest(string command)
         {
-            string uri = $"{gameServer}{command}&t={DateTime.Now.ToUTC()}&e={GetNewUDID()}&gz=1{uriend()}";
-            var request = WebRequest.Create(uri) as HttpWebRequest;
-            request.Method = @"POST";
-            request.ProtocolVersion = new Version(1, 1);
-            if (device != null)
-                request.UserAgent = device;
-            request.KeepAlive = true;
-            request.ContentType = @"application/x-www-form-urlencoded";
-            request.CookieContainer = new CookieContainer();
-            request.CookieContainer.Add(new Uri(gameServer), new Cookie("hf_skey", hf_skey));
-            request.CookieContainer.Add(new Uri(gameServer), new Cookie("path", @"/"));
-
-            string param = "pve_level=1";
-            byte[] bs = Encoding.UTF8.GetBytes(param);
-            using (Stream reqStream = request.GetRequestStream())
-            {
-                reqStream.Write(bs, 0, bs.Length);
-            }
-
-            using (var response = request.GetResponse() as HttpWebResponse)
-            {
-                using (Stream responsestream = response.GetResponseStream())
+            client.BaseAddress = gameServer;
+            return client.UploadValues(
+                $"{command}&t={DateTime.Now.ToUTC()}&e={GetNewUDID()}&gz=1{uriend()}",
+                new NameValueCollection
                 {
-                    responsestream.ReadByte();
-                    responsestream.ReadByte();
-                    using (var dzip = new DeflateStream(responsestream, CompressionMode.Decompress))
-                    {
-                        using (var sr = new StreamReader(dzip))
-                        {
-                            return sr.ReadToEnd();
-                        }
-                    }
+                    {"pve_level", "1"}
                 }
-            }
+            ).decompressData();
         }
 
         public void login(int server)
@@ -422,7 +349,7 @@ namespace WarshipGirlsFinalTool
             gameinfo = CreateJsonText(StdGetRequest(@"api/initGame/"));
         }
 
-        public string explore_getResult(string expID,bool messagebox = true)
+        public string explore_getResult(string expID, bool messagebox = true)
         {
             JsonText Res = CreateJsonText(StdGetRequest($"explore/getResult/{expID}/"));
             if (Res["updateTaskVo"] != null)
@@ -430,8 +357,8 @@ namespace WarshipGirlsFinalTool
                 foreach (var taskUpdate in Res["updateTaskVo"])
                 {
                     var taskCondition = from task in gameinfo["taskVo"]
-                        where (string) task["taskCid"] == (string) taskUpdate["taskCid"]
-                        select task;
+                                        where (string)task["taskCid"] == (string)taskUpdate["taskCid"]
+                                        select task;
                     taskCondition.First()["condition"] = taskUpdate["condition"];
                 }
             }
@@ -441,8 +368,8 @@ namespace WarshipGirlsFinalTool
             var mergeSettings = new JsonMergeSettings
             {
                 MergeArrayHandling = MergeArrayHandling.Union
-            };            
-            ((JObject) gameinfo["userVo"]).Merge(Res["userLevelVo"], mergeSettings);
+            };
+            ((JObject)gameinfo["userVo"]).Merge(Res["userLevelVo"], mergeSettings);
             //((JObject)gameinfo["detailInfo"]).Merge(Res["userLevelVo"], mergeSettings);
             JToken packageVo;
             if (Res.obj.TryGetValue("packageVo", out packageVo))
@@ -506,7 +433,7 @@ namespace WarshipGirlsFinalTool
                 }
                 shipIndex++;
             }
-            if(messagebox)
+            if (messagebox)
                 MessageBox.Show(resStr, getLangStr("HasFinishedPVEExplore"));
             return resStr;
         }
@@ -525,7 +452,7 @@ namespace WarshipGirlsFinalTool
             }
         }
 
-        public void explore_start(string expID,string fleetID)
+        public void explore_start(string expID, string fleetID)
         {
             JsonText Res = CreateJsonText(StdPostRequest($"explore/start/{fleetID}/{expID}/"));
             gameinfo["pveExploreVo"] = Res["pveExploreVo"];
@@ -608,8 +535,8 @@ namespace WarshipGirlsFinalTool
 
             //船只
             var shipTitle = from ship in init_txt["shipCard"]
-                where (string) ship["cid"] == cid.ToString()
-                select (string) ship["title"];
+                            where (string)ship["cid"] == cid.ToString()
+                            select (string)ship["title"];
             if (shipTitle.Any())
                 return shipTitle.First();
 
@@ -628,13 +555,14 @@ namespace WarshipGirlsFinalTool
             if (ret == "0")
             {
                 ret = (from fleet in gameinfo["fleetVo"]
-                               where fleet["id"].ToString() == "1"
-                               select fleet["ships"][0].ToString()).First();
+                       where fleet["id"].ToString() == "1"
+                       select fleet["ships"][0].ToString()).First();
             }
             return ret;
         }
     }
 
+    [DebuggerDisplay("{text}")]
     public class JsonText
     {
         public string text;
@@ -650,7 +578,7 @@ namespace WarshipGirlsFinalTool
         {
             get { return obj[index]; }
             set { obj[index] = value; }
-        } 
+        }
 
         public void Parse()
         {

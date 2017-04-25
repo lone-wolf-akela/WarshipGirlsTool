@@ -1,5 +1,8 @@
-﻿using System;
+﻿#define CBT
+
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,23 +22,6 @@ using System.Configuration;
 
 namespace WarshipGirlsPC
 {
-    public class UserInfoConfig : ConfigurationSection
-    {
-        [ConfigurationProperty("Username", DefaultValue = "", IsRequired = true)]
-        public string Username
-        {
-            get { return this["Username"].ToString(); }
-            set { this["Username"] = value; }
-        }
-
-        [ConfigurationProperty("Password", DefaultValue = "",  IsRequired = true)]
-        public string Password
-        {
-            get { return this["Password"].ToString(); }
-            set { this["Password"] = value; }
-        }
-    }
-
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
@@ -67,6 +53,7 @@ namespace WarshipGirlsPC
             InitializeComponent();
         }
 
+ 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             res.core?.Close();
@@ -77,16 +64,21 @@ namespace WarshipGirlsPC
             {
                 res.core = new Warshipgirls
                 {
-                    version = @"2.9.0",
-                    device = @"Lone Wolf PC Client/0.1.0 (Windows 10) https://github.com/lone-wolf-akela/WarshipGirlsTool",
+                    version = @"2.9.10",
                     username = Username.Text,
                     password = Password.Password,
                 };
                 if ((bool)iOS.IsChecked)
                 {
+#if(CBT)
+                    res.core.firstSever = @" http://cbt.jianniang.com/";                                     
+                    res.core.market = 0;
+                    res.core.channel = 0;
+#else
                     res.core.firstSever = @"http://version.jr.moefantasy.com/";
                     res.core.market = 3;
                     res.core.channel = 1;
+#endif
                 }
                 else if ((bool)Android.IsChecked)
                 {
@@ -110,42 +102,36 @@ namespace WarshipGirlsPC
                 {
                     res.winDownload = new Downloading();
                     res.winDownload.Show();
+                    res.winDownload.Topmost = true;
 
-                    res.core.downloadRes();
+                    var worker = new BackgroundWorker();
+                    worker.DoWork += delegate
+                    {
+                        res.core.downloadRes(
+                            (stage, filename,  current,  max) =>
+                            {
+                                res.winDownload.Dispatcher.BeginInvoke(new Action(
+                                    () =>
+                                    {
+                                        res.winDownload.Update(stage, filename, current, max);
+                                    })
+                                );
+                            }
+                            );
+                    };
+                    worker.RunWorkerCompleted += delegate
+                    {
+                        res.winDownload.Close();
+                        Activate();
 
-                    res.winDownload.Close();
-
-                    Activate();
+                        eventAfterResDownloading();
+                    };
+                    worker.RunWorkerAsync();
                 }
-
-                res.core.getInitConfigs();
-                res.core.passportLogin();
-
-                var configini = new IniFile("config.ini");
-                configini.Write("USERNAME", Username.Text, "Account");
-                configini.Write("PASSWORD", Password.Password, "Account");
-                configini.Write("SERVER", (bool)iOS.IsChecked ? "iOS" : (bool)Android.IsChecked ? "Android" : "Japan", "Account");
-
-                for (int i = 0; i < res.core.passportLogin_txt["serverList"].Count(); i++)
+                else
                 {
-                    ((Button)FindName($"btnServer{i}")).Visibility = Visibility.Visible;
-                    ((Button)FindName($"btnServer{i}")).Content = (string)res.core.passportLogin_txt["serverList"][i]["name"];
-                }
-                for (int i = res.core.passportLogin_txt["serverList"].Count(); i < 13; i++)
-                {
-                    ((Button)FindName($"btnServer{i}")).Visibility = Visibility.Hidden;
-                }
-
-                for (selectedServerIndex = 0;
-                    (string)res.core.passportLogin_txt["serverList"][selectedServerIndex]["id"] !=
-                    (string)res.core.passportLogin_txt["defaultServer"]; selectedServerIndex++
-                    )
-                    ;
-
-                btnServer.Content = (string)res.core.passportLogin_txt["serverList"][selectedServerIndex]["name"];
-
-                Storyboard sb = FindResource("loginBoardShrink") as Storyboard;
-                sb.Begin();
+                    eventAfterResDownloading();
+                }            
             }
 #if (DEBUG)
 #else
@@ -155,6 +141,39 @@ namespace WarshipGirlsPC
             }  
 #endif
         }
+        private void eventAfterResDownloading()
+        {
+            res.core.getInitConfigs();
+            res.core.passportLogin();
+
+            var configini = new IniFile("config.ini");
+            configini.Write("USERNAME", Username.Text, "Account");
+            configini.Write("PASSWORD", Password.Password, "Account");
+            configini.Write("SERVER", (bool)iOS.IsChecked ? "iOS" : (bool)Android.IsChecked ? "Android" : "Japan", "Account");
+
+            for (int i = 0; i < res.core.passportLogin_txt["serverList"].Count(); i++)
+            {
+                ((Button)FindName($"btnServer{i}")).Visibility = Visibility.Visible;
+                ((Button)FindName($"btnServer{i}")).Content = (string)res.core.passportLogin_txt["serverList"][i]["name"];
+            }
+            for (int i = res.core.passportLogin_txt["serverList"].Count(); i < 13; i++)
+            {
+                ((Button)FindName($"btnServer{i}")).Visibility = Visibility.Hidden;
+            }
+
+            for (selectedServerIndex = 0;
+                (string)res.core.passportLogin_txt["serverList"][selectedServerIndex]["id"] !=
+                (string)res.core.passportLogin_txt["defaultServer"];
+                selectedServerIndex++
+                )
+                ;
+
+            btnServer.Content = (string)res.core.passportLogin_txt["serverList"][selectedServerIndex]["name"];
+
+            Storyboard sb = FindResource("loginBoardShrink") as Storyboard;
+            sb.Begin();
+        }
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {

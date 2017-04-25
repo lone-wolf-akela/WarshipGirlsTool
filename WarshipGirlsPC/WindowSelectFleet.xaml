@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="选择舰队" Height="320.606" Width="468.43" Icon="WarshipGirls.ico" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <Window.Background>
-        <ImageBrush ImageSource="UnderConstructiom.png" Stretch="Uniform" TileMode="Tile"/>
+        <ImageBrush ImageSource="Resources/UnderConstructiom.png" Stretch="Uniform" TileMode="Tile"/>
     </Window.Background>
     <Grid Margin="0">
         <Grid>

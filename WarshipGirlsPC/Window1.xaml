@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="战舰少女R" Height="720" Width="1280" Icon="WarshipGirls.ico" Closed="Window_Closed" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Activated="Window_Activated" Deactivated="Window_Deactivated" StateChanged="Window_StateChanged">
     <Window.Background>
-        <ImageBrush ImageSource="main_eve_bg.png" Stretch="UniformToFill"/>
+        <ImageBrush ImageSource="Resources/main_eve_bg.png" Stretch="UniformToFill"/>
     </Window.Background>
     <Window.Resources>
         <Style x:Key="ButtonDock" TargetType="{x:Type Button}">
@@ -37,14 +37,14 @@
                                 </PathGeometry>
                             </Path.Data>
                             <Path.Fill>
-                                <ImageBrush ImageSource="main_btn_sheep.png"/>
+                                <ImageBrush ImageSource="Resources/main_btn_sheep.png"/>
                             </Path.Fill>
                         </Path>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Fill" TargetName="shape_1">
                                     <Setter.Value>
-                                        <ImageBrush ImageSource="main_btn_sheep_g.png"/>
+                                        <ImageBrush ImageSource="Resources/main_btn_sheep_g.png"/>
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -80,14 +80,14 @@
                                 </PathGeometry>
                             </Path.Data>
                             <Path.Fill>
-                                <ImageBrush ImageSource="main_btn_construction.png"/>
+                                <ImageBrush ImageSource="Resources/main_btn_construction.png"/>
                             </Path.Fill>
                         </Path>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Fill" TargetName="shape_1">
                                     <Setter.Value>
-                                        <ImageBrush ImageSource="main_btn_construction_g.png"/>
+                                        <ImageBrush ImageSource="Resources/main_btn_construction_g.png"/>
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -123,14 +123,14 @@
                                 </PathGeometry>
                             </Path.Data>
                             <Path.Fill>
-                                <ImageBrush ImageSource="main_btn_out.png"/>
+                                <ImageBrush ImageSource="Resources/main_btn_out.png"/>
                             </Path.Fill>
                         </Path>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Fill" TargetName="shape_1">
                                     <Setter.Value>
-                                        <ImageBrush ImageSource="main_btn_out_g.png"/>
+                                        <ImageBrush ImageSource="Resources/main_btn_out_g.png"/>
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -166,14 +166,14 @@
                                 </PathGeometry>
                             </Path.Data>
                             <Path.Fill>
-                                <ImageBrush ImageSource="main_btn_gaizao.png"/>
+                                <ImageBrush ImageSource="Resources/main_btn_gaizao.png"/>
                             </Path.Fill>
                         </Path>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Fill" TargetName="shape_1">
                                     <Setter.Value>
-                                        <ImageBrush ImageSource="main_btn_gaizao_g.png"/>
+                                        <ImageBrush ImageSource="Resources/main_btn_gaizao_g.png"/>
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -186,7 +186,7 @@
     <Grid>
         <Grid x:Name="imgSecretary" Margin="-145.6,-119.6,429.6,-179.6">
             <Grid.Background>
-                <ImageBrush ImageSource="L_NORMAL_1.png" Stretch="Uniform"/>
+                <ImageBrush ImageSource="Resources/L_NORMAL_1.png" Stretch="Uniform"/>
             </Grid.Background>
         </Grid>
         <Viewbox HorizontalAlignment="Right" VerticalAlignment="Top" Width="800" Height="41.465">
@@ -197,18 +197,18 @@
                     <Label x:Name="lb_steel" Content="Label" Margin="0,0,3,8" Width="67.657" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Foreground="White" FontSize="14"/>
                     <Label x:Name="lb_alum" Content="Label" Margin="0,0,3,8" Width="67.657" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Foreground="White" FontSize="14"/>
                 </UniformGrid>
-                <Image Margin="0" Source="main_source_frame.png" HorizontalAlignment="Left"/>
+                <Image Margin="0" Source="Resources/main_source_frame.png" HorizontalAlignment="Left"/>
                 <Label x:Name="lb_diam" Content="Label" Margin="0,0,69,8" Width="67.657" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Foreground="White" FontSize="14" Panel.ZIndex="1"/>
-                <Image HorizontalAlignment="Right" Margin="0,0,0,-21" Width="250.647" Source="main_source_diam.png"/>
+                <Image HorizontalAlignment="Right" Margin="0,0,0,-21" Width="250.647" Source="Resources/main_source_diam.png"/>
             </Grid>
         </Viewbox>
         <Viewbox HorizontalAlignment="Left" Height="81.6" Margin="0" VerticalAlignment="Top" Width="230.667">
             <Grid Width="292.157" Height="100">
-                <Image Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Source="main_leftupon_frame.png"/>
+                <Image Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" Source="Resources/main_leftupon_frame.png"/>
                 <Label Content="Lv." HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,14.185,0,0" FontSize="16" Foreground="#FFF5B65A"/>
                 <Label x:Name="lb_lv" Content="Label" HorizontalAlignment="Left" Margin="34.46,10,0,0" Foreground="#FFFFFFFD" VerticalAlignment="Top" FontSize="20" Height="34.505" Width="66.323" d:LayoutOverrides="VerticalAlignment"/>
                 <Viewbox x:Name="vb_lvProgress" Stretch="None" Margin="4,0,22.16,0" RenderTransformOrigin="0.5,0.5">
-                    <Image Source="main_progress.png" Panel.ZIndex="1" Height="85.216" Width="267.093" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Image Source="Resources/main_progress.png" Panel.ZIndex="1" Height="85.216" Width="267.093" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </Viewbox>
             </Grid>
         </Viewbox>
@@ -267,7 +267,7 @@
                     </UniformGrid>
                     <Grid x:Name="lb_expFinished" Height="100" VerticalAlignment="Top" Margin="142.037,-87.862,23.825,0">
                         <Grid.Background>
-                            <ImageBrush ImageSource="main_pop.PNG"/>
+                            <ImageBrush ImageSource="Resources/main_pop.PNG"/>
                         </Grid.Background>
                         <Label Content="远征完成！&#xD;&#xA;" Margin="42.527,18.703,34.316,43.916" Foreground="#FFFF1400" FontSize="22"/>
                     </Grid>

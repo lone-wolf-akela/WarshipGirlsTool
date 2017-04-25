@@ -5,11 +5,13 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Net;
 using System.Resources;
 using System.Xml.Linq;
 using Data;
@@ -43,25 +45,6 @@ namespace WarshipGirlsFinalTool
         {
             var file = new FileInfo(fileName);
             return file.Length;
-        }
-
-        [DllImport("Shlwapi.dll", CharSet = CharSet.Auto)]
-        private static extern long StrFormatByteSize(
-                long fileSize
-                , [MarshalAs(UnmanagedType.LPTStr)] StringBuilder buffer
-                , int bufferSize);
-
-
-        /// <summary>
-        /// Converts a numeric value into a string that represents the number expressed as a size value in bytes, kilobytes, megabytes, or gigabytes, depending on the size.
-        /// </summary>
-        /// <param name="filesize">The numeric value to be converted.</param>
-        /// <returns>the converted string</returns>
-        public static string StrFormatByteSize(long filesize)
-        {
-            StringBuilder sb = new StringBuilder(1024);
-            StrFormatByteSize(filesize, sb, sb.Capacity);
-            return sb.ToString();
         }
 
         //From https://adamprescott.net/2012/03/02/custom-shaped-windows-forms-from-images/
@@ -133,6 +116,41 @@ namespace WarshipGirlsFinalTool
                 bi.EndInit();
             }
             return bi;
+        }
+
+        public static string decompressData(this byte[] data)
+        {
+            using (var memstream = new MemoryStream(data))
+            {
+                memstream.ReadByte();
+                memstream.ReadByte();
+                using (var dzip = new DeflateStream(memstream, CompressionMode.Decompress))
+                {
+                    using (var sr = new StreamReader(dzip))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+        }
+
+        [DllImport("Shlwapi.dll", CharSet = CharSet.Auto)]
+        private static extern long StrFormatByteSize(
+        long fileSize
+        , [MarshalAs(UnmanagedType.LPTStr)] StringBuilder buffer
+        , int bufferSize);
+
+
+        /// <summary>
+        /// Converts a numeric value into a string that represents the number expressed as a size value in bytes, kilobytes, megabytes, or gigabytes, depending on the size.
+        /// </summary>
+        /// <param name="filesize">The numeric value to be converted.</param>
+        /// <returns>the converted string</returns>
+        public static string StrFormatByteSize(this long filesize)
+        {
+            StringBuilder sb = new StringBuilder(1024);
+            StrFormatByteSize(filesize, sb, sb.Capacity);
+            return sb.ToString();
         }
     }
     public class Music : IDisposable
@@ -414,6 +432,58 @@ namespace WarshipGirlsFinalTool
 
             cache.Add(file,ret);
             return ret;          
+        }
+    }
+
+    public class WebClientEx : WebClient
+    {
+        public readonly Dictionary<string, string> Cookies = new Dictionary<string, string>();
+
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            WebRequest r = base.GetWebRequest(address);
+            var request = r as HttpWebRequest;
+            if (request != null)
+            {
+                //request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+                if (BaseAddress != "")
+                {
+                    request.CookieContainer = new CookieContainer();
+                    foreach (var cookie in Cookies)
+                    {
+                        request.CookieContainer.Add(
+                            new Uri(BaseAddress), new Cookie(cookie.Key, cookie.Value)
+                        );
+                    }
+                }
+            }
+            return r;
+        }
+
+        protected override WebResponse GetWebResponse(WebRequest request, IAsyncResult result)
+        {
+            WebResponse response = base.GetWebResponse(request, result);
+            ReadCookies(response);
+            return response;
+        }
+
+        protected override WebResponse GetWebResponse(WebRequest request)
+        {
+            WebResponse response = base.GetWebResponse(request);
+            ReadCookies(response);
+            return response;
+        }
+
+        private void ReadCookies(WebResponse r)
+        {
+            var response = r as HttpWebResponse;
+            if (response != null)
+            {
+                foreach (Cookie cookie in response.Cookies)
+                {
+                    Cookies[cookie.Name] = cookie.Value;
+                }
+            }
         }
     }
 }

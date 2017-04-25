@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="出征" Height="483.6" Width="744.911" Icon="WarshipGirls.ico" Activated="Window_Activated" Deactivated="Window_Deactivated" Loaded="Window_Loaded" Closed="Window_Closed" WindowStartupLocation="CenterScreen">
     <Window.Background>
-        <ImageBrush ImageSource="UnderConstructiom.png" Stretch="Uniform" TileMode="FlipXY"/>
+        <ImageBrush ImageSource="Resources/UnderConstructiom.png" Stretch="Uniform" TileMode="FlipXY"/>
     </Window.Background>
     <Grid Margin="0">
         <Grid>

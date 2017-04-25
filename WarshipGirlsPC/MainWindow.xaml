@@ -48,7 +48,7 @@
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Background">
                 <Setter.Value>
-                    <ImageBrush ImageSource="login_server_bar2.png"/>
+                    <ImageBrush ImageSource="Resources/login_server_bar2.png"/>
                 </Setter.Value>
             </Setter>
             <Setter Property="Template">
@@ -139,7 +139,7 @@
                 <RowDefinition Height="79*"/>
             </Grid.RowDefinitions>
             <Grid.Background>
-                <ImageBrush ImageSource="Login.png"/>
+                <ImageBrush ImageSource="Resources/Login.png"/>
             </Grid.Background>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="43*"/>
@@ -163,10 +163,10 @@
                         <Image Stretch="UniformToFill">
                             <Image.Style>
                                 <Style TargetType="Image">
-                                    <Setter Property="Source" Value="login_btn_enter_normal.png" />
+                                    <Setter Property="Source" Value="Resources/login_btn_enter_normal.png" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Value="True">
-                                            <Setter Property="Source" Value="login_btn_enter_click.png" />
+                                            <Setter Property="Source" Value="Resources/login_btn_enter_click.png" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
