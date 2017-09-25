@@ -123,7 +123,7 @@ namespace WarshipGirlsFinalTool
         /*******************************/
         private string uriend()
         {
-            return $"&market={market}&channel={channel}&version={version}";
+            return $"&version={version}&channel={channel}&market={market}";
         }
 
         private JsonText CreateJsonText(string text)
@@ -139,7 +139,7 @@ namespace WarshipGirlsFinalTool
         public void checkVer()
         {
             client.BaseAddress = firstSever;
-            version_txt = CreateJsonText(client.DownloadString($"index/checkVer/{version}/{market}/{channel}{uriend()}"));
+            version_txt = CreateJsonText(client.DownloadString($"index/checkVer/{version}/{channel}/{market}{uriend()}"));
 
             loginServer = (string)version_txt["loginServer"];
             if (version_txt["ResUrlWu"] != null)
@@ -167,7 +167,7 @@ namespace WarshipGirlsFinalTool
             init_txt = CreateJsonText(
                 client.DownloadData(
                     $"index/getInitConfigs/&t={DateTime.Now.ToUTC()}&e={helper.GetNewUDID()}&gz=1{uriend()}"
-                ).decompressData()
+                ).decompressZlibData()
             );
             File.WriteAllText("documents/init.txt", init_txt.text);
         }
@@ -201,13 +201,15 @@ namespace WarshipGirlsFinalTool
         public delegate void DownloadProcessDelegate(ResDownloadStage stage, string filename, long current, long max);
         public void downloadRes(DownloadProcessDelegate callback)
         {
+#if (DEBUG)
+#else
             try
+#endif
             {
                 JsonText old_proj_manifest = proj_manifest;
                 client.BaseAddress = "";
                 client.DownloadString(ResUrlWu);
-                proj_manifest = CreateJsonText(client.DownloadString(ResUrlWu));
-                //proj_manifest = CreateJsonText(proj_manifest.text);
+                proj_manifest = CreateJsonText(client.DownloadData(ResUrlWu).decompressGZipData());
                 packageUrl = (string)proj_manifest["packageUrl"];
                 File.WriteAllText("documents/proj.manifest", proj_manifest.text);
 
@@ -296,10 +298,13 @@ namespace WarshipGirlsFinalTool
 
                 imageFinder.reset();
             }
+#if (DEBUG)
+#else
             catch (Exception e)
             {
                 Debug.Fail(e.Message);
             }
+#endif
         }
 
         public void passportLogin()
@@ -310,10 +315,10 @@ namespace WarshipGirlsFinalTool
                     $"index/passportLogin/&t={DateTime.Now.ToUTC()}&e={GetNewUDID()}&gz=1{uriend()}",
                     new NameValueCollection
                     {
-                        {"username", username},
-                        {"pwd", password}
+                        {"username", username.Base64Encode()},
+                        {"pwd", password.Base64Encode()}
                     }
-                ).decompressData()
+                ).decompressZlibData()
             );
             hf_skey = (string)passportLogin_txt["hf_skey"];
         }
@@ -323,7 +328,7 @@ namespace WarshipGirlsFinalTool
             client.BaseAddress = gameServer;
             return client.DownloadData(
                 $"{command}&t={DateTime.Now.ToUTC()}&e={GetNewUDID()}&gz=1{uriend()}"
-            ).decompressData();
+            ).decompressZlibData();
         }
 
         private string StdPostRequest(string command)
@@ -335,7 +340,7 @@ namespace WarshipGirlsFinalTool
                 {
                     {"pve_level", "1"}
                 }
-            ).decompressData();
+            ).decompressZlibData();
         }
 
         public void login(int server)
@@ -346,7 +351,7 @@ namespace WarshipGirlsFinalTool
 
         public void initGame()
         {
-            gameinfo = CreateJsonText(StdGetRequest(@"api/initGame/"));
+            gameinfo = CreateJsonText(StdGetRequest(@"api/initGame/?&crazy=1"));
         }
 
         public string explore_getResult(string expID, bool messagebox = true)
@@ -458,6 +463,14 @@ namespace WarshipGirlsFinalTool
             gameinfo["pveExploreVo"] = Res["pveExploreVo"];
             gameinfo["fleetVo"] = Res["fleetVo"];
         }
+
+
+        public void boat_renameship(int shipid, string newname)
+        {
+            JsonText Res = CreateJsonText(StdGetRequest($"boat/renameShip/{shipid}/{WebUtility.UrlEncode(newname)}/"));
+            //TODO:更新数据
+        }
+
         /////////////////////////////////////////////////////////////////////
 
         public string getShipImgName(string shipID, ShipImageType type)

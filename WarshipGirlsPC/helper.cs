@@ -118,13 +118,27 @@ namespace WarshipGirlsFinalTool
             return bi;
         }
 
-        public static string decompressData(this byte[] data)
+        public static string decompressZlibData(this byte[] data)
         {
             using (var memstream = new MemoryStream(data))
             {
                 memstream.ReadByte();
                 memstream.ReadByte();
                 using (var dzip = new DeflateStream(memstream, CompressionMode.Decompress))
+                {
+                    using (var sr = new StreamReader(dzip))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+        }
+
+        public static string decompressGZipData(this byte[] data)
+        {
+            using (var memstream = new MemoryStream(data))
+            {
+                using (var dzip = new GZipStream(memstream, CompressionMode.Decompress))
                 {
                     using (var sr = new StreamReader(dzip))
                     {
@@ -151,6 +165,12 @@ namespace WarshipGirlsFinalTool
             StringBuilder sb = new StringBuilder(1024);
             StrFormatByteSize(filesize, sb, sb.Capacity);
             return sb.ToString();
+        }
+
+        public static string Base64Encode(this string plainText)
+        {
+            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+            return Convert.ToBase64String(plainTextBytes);
         }
     }
     public class Music : IDisposable

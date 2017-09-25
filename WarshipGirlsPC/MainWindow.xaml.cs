@@ -1,6 +1,4 @@
-﻿//#define CBT
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -64,21 +62,15 @@ namespace WarshipGirlsPC
             {
                 res.core = new Warshipgirls
                 {
-                    version = @"2.9.10",
+                    version = @"3.3.0",
                     username = Username.Text,
                     password = Password.Password,
                 };
                 if ((bool)iOS.IsChecked)
                 {
-#if(CBT)
-                    res.core.firstSever = @" http://cbt.jianniang.com/";                                     
-                    res.core.market = 0;
-                    res.core.channel = 0;
-#else
                     res.core.firstSever = @"http://version.jr.moefantasy.com/";
-                    res.core.market = 3;
-                    res.core.channel = 1;
-#endif
+                    res.core.market = 2;
+                    res.core.channel = 100020;
                 }
                 else if ((bool)Android.IsChecked)
                 {
